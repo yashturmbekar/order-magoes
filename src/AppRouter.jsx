@@ -1,16 +1,19 @@
 import React from 'react';
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom'; // Use Routes instead of Switch
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import LandingPage from './LandingPage';
 import AdminLogin from './AdminLogin';
 import AdminOrders from './AdminOrders';
 
 export default function AppRouter() {
   return (
-    <Router>
+    <Router basename="/">
       <Routes>
-        <Route path="/" element={<LandingPage />} /> {/* For home/landing page */}
-        <Route path="/admin/login" element={<AdminLogin />} /> {/* Admin login page */}
-        <Route path="/admin/orders" element={<AdminOrders />} /> {/* Admin orders page */}
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
+        <Route path="/admin/orders" element={<AdminOrders />} />
+        
+        {/* Optional fallback route (404 handling) */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

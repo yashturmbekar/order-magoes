@@ -1,17 +1,12 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import LandingPage from './LandingPage';
-import AdminOrders from './AdminOrders';
-import AdminLogin from './AdminLogin';
+import ReactDOM from 'react-dom/client'; // ✅ Updated import
+import AppRouter from './AppRouter';
+import './style.css';
 
-export default function AppRouter() {
-  return (
-    <BrowserRouter basename="/">
-      <Routes>
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/orders" element={<AdminOrders />} />
-      </Routes>
-    </BrowserRouter>
-  );
-}
+const root = ReactDOM.createRoot(document.getElementById('root')); // ✅ React 18 method
+root.render(
+  <React.StrictMode>
+    <AppRouter />
+  </React.StrictMode>
+);
+
