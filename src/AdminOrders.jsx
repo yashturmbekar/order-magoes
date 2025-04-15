@@ -206,7 +206,7 @@ export default function AdminOrders() {
                                     })
                                   }
                                 >
-                                  Update
+                                  Update order
                                 </button>
                                 <button
                                   className="cancel-btn"
@@ -234,7 +234,7 @@ export default function AdminOrders() {
                                     }
                                   }}
                                 >
-                                  Cancel
+                                  Cancel order
                                 </button>
                               </>
                             ) : (
