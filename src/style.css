@@ -223,6 +223,10 @@ button:hover {
 .table-wrapper {
   width: 100%;
   overflow-x: auto;
+  background: rgba(255, 255, 255, 0.9); /* Semi-transparent white background */
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
 }
 
 /* Orders Table */
@@ -254,6 +258,49 @@ button:hover {
 .orders-table tr.inactive {
   background-color: #ffeaea;
   color: #999;
+}
+
+/* Highlight rows based on payment and delivery status */
+.orders-table tr.warning {
+  background-color: rgba(
+    255,
+    193,
+    7,
+    0.8
+  ); /* Bright yellow with transparency */
+  color: #856404; /* Dark yellow text */
+}
+
+.orders-table tr.success {
+  background-color: rgba(40, 167, 69, 0.8); /* Bright green with transparency */
+  color: #155724; /* Dark green text */
+}
+
+/* Row colors based on order status */
+.orders-table tr.order-received {
+  background-color: #e3f2fd; /* Lighter blue */
+  color: #0d47a1; /* Darker blue text */
+}
+
+/* Adjusted visibility for 'in-progress' rows */
+.orders-table tr.in-progress {
+  background-color: #fff9c4; /* Lighter yellow */
+  color: #f57f17; /* Slightly lighter orange text */
+}
+
+.orders-table tr.out-for-delivery {
+  background-color: #e0f7fa; /* Softer cyan */
+  color: #006064; /* Teal text */
+}
+
+.orders-table tr.delivered {
+  background-color: #dcedc8; /* Light green */
+  color: #33691e; /* Dark green text */
+}
+
+.orders-table tr.order-received-payment-completed {
+  background-color: #c8e6c9; /* Softer green */
+  color: #1b5e20; /* Darker green text */
 }
 
 /* Dropdowns */

@@ -1,5 +1,10 @@
-import React, { useState, useEffect } from 'react';
-import { getAllOrders, updateOrder, cancelOrder, activateOrder } from './utils/api';
+import React, { useState, useEffect } from "react";
+import {
+  getAllOrders,
+  updateOrder,
+  cancelOrder,
+  activateOrder,
+} from "./utils/api";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -9,11 +14,11 @@ export default function AdminOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem('adminToken');
+        const token = localStorage.getItem("adminToken");
         const ordersData = await getAllOrders(token);
         setOrders(ordersData);
       } catch (err) {
-        setError('Failed to fetch orders.');
+        setError("Failed to fetch orders.");
       } finally {
         setLoading(false);
       }
@@ -24,10 +29,15 @@ export default function AdminOrders() {
 
   const handleUpdate = async (orderId, updatedFields) => {
     try {
-      const token = localStorage.getItem('adminToken');
+      const token = localStorage.getItem("adminToken");
       await updateOrder(orderId, updatedFields, token);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === orderId ? { ...order, ...updatedFields } : order
+        )
+      );
     } catch (err) {
-      alert('Failed to update order');
+      alert("Failed to update order");
     }
   };
 
@@ -43,7 +53,8 @@ export default function AdminOrders() {
         <div className="hero">
           <p className="tagline">Admin Dashboard</p>
           <h1>
-            Mangoes <span className="highlight">At</span><br />
+            Mangoes <span className="highlight">At</span>
+            <br />
             <span className="highlight">Your Doorstep</span>
           </h1>
           <p className="subtitle">Manage Orders</p>
@@ -60,7 +71,7 @@ export default function AdminOrders() {
               <table className="orders-table">
                 <thead>
                   <tr>
-                    <th>ID</th>
+                    <th>#</th>
                     <th>Order Id</th>
                     <th>Name</th>
                     <th>Phone</th>
@@ -72,97 +83,151 @@ export default function AdminOrders() {
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, index) => (
-                    <tr key={order.id} className={order.isActive === false ? 'inactive' : ''}>
-                      <td>{order.id}</td>
-                      <td>{order.orderId}</td>
-                      <td>{order.name}</td>
-                      <td>{order.phone}</td>
-                      <td>{order.quantity}</td>
-                      <td>{order.location}</td>
+                  {orders.map((order, index) => {
+                    const getRowClass = () => {              
+                      if (order.orderStatus === "delivered" && order.paymentStatus === "completed")
+                        return "order-received-payment-completed";
+                      if (order.orderStatus === "order_received")
+                        return "order-received";
+                      if (order.orderStatus === "in_progress")
+                        return "in-progress";
+                      if (order.orderStatus === "out_for_delivery")
+                        return "out-for-delivery";
+                      if (order.orderStatus === "delivered" && order.paymentStatus !== "completed" ) return "delivered";
+                      return "";
+                    };
 
-                      <td>
-                        <select
-                          value={order.orderStatus || 'order_received'}
-                          onChange={(e) => handleChange(index, 'orderStatus', e.target.value)}
-                          disabled={!order.isActive}
-                        >
-                          <option value="order_received">Order Received</option>
-                          <option value="in_progress">In Progress</option>
-                          <option value="out_for_delivery">Out for Delivery</option>
-                          <option value="delivered">Delivered Successfully</option>
-                        </select>
-                      </td>
+                    const rowClass = getRowClass();
 
-                      <td>
-                        <select
-                          value={order.paymentStatus || 'pending'}
-                          onChange={(e) => handleChange(index, 'paymentStatus', e.target.value)}
-                          disabled={!order.isActive}
-                        >
-                          <option value="pending">Payment Pending</option>
-                          <option value="completed">Payment Completed</option>
-                        </select>
-                      </td>
+                    return (
+                      <tr
+                        key={order.id}
+                        className={`${rowClass} ${
+                          order.isActive === false ? "inactive" : ""
+                        }`}
+                      >
+                        <td>{index + 1}</td>
+                        <td>{order.orderId}</td>
+                        <td>{order.name}</td>
+                        <td>{order.phone}</td>
+                        <td>{order.quantity}</td>
+                        <td>{order.location}</td>
 
-                      <td>
-                        <div className="action-buttons">
-                          {order.isActive ? (
-                            <>
-                              <button
-                                className="update-btn"
-                                onClick={() =>
-                                  handleUpdate(order.id, {
-                                    orderStatus: order.orderStatus,
-                                    paymentStatus: order.paymentStatus,
-                                  })
-                                }
-                              >
-                                Update
-                              </button>
-                              <button
-                                className="cancel-btn"
-                                onClick={async () => {
-                                  const token = localStorage.getItem('adminToken');
-                                  if (window.confirm('Are you sure you want to cancel this order?')) {
-                                    try {
-                                      await cancelOrder(order.id, token);
-                                      alert('Order cancelled successfully');
-                                      setOrders((prev) =>
-                                        prev.map((o) => (o.id === order.id ? { ...o, isActive: false } : o))
-                                      );
-                                    } catch (err) {
-                                      alert('Failed to cancel order');
+                        <td>
+                          <select
+                            value={order.orderStatus || "order_received"}
+                            onChange={(e) => {
+                              handleChange(
+                                index,
+                                "orderStatus",
+                                e.target.value
+                              );
+                            }}
+                            disabled={!order.isActive}
+                          >
+                            <option value="order_received">
+                              Order Received
+                            </option>
+                            <option value="in_progress">In Progress</option>
+                            <option value="out_for_delivery">
+                              Out for Delivery
+                            </option>
+                            <option value="delivered">
+                              Delivered Successfully
+                            </option>
+                          </select>
+                        </td>
+
+                        <td>
+                          <select
+                            value={order.paymentStatus || "pending"}
+                            onChange={(e) =>
+                              handleChange(
+                                index,
+                                "paymentStatus",
+                                e.target.value
+                              )
+                            }
+                            disabled={!order.isActive}
+                          >
+                            <option value="pending">Payment Pending</option>
+                            <option value="completed">Payment Completed</option>
+                          </select>
+                        </td>
+
+                        <td>
+                          <div className="action-buttons">
+                            {order.isActive ? (
+                              <>
+                                <button
+                                  className="update-btn"
+                                  onClick={() =>
+                                    handleUpdate(order.id, {
+                                      orderStatus: order.orderStatus,
+                                      paymentStatus: order.paymentStatus,
+                                    })
+                                  }
+                                >
+                                  Update
+                                </button>
+                                <button
+                                  className="cancel-btn"
+                                  onClick={async () => {
+                                    const token =
+                                      localStorage.getItem("adminToken");
+                                    if (
+                                      window.confirm(
+                                        "Are you sure you want to cancel this order?"
+                                      )
+                                    ) {
+                                      try {
+                                        await cancelOrder(order.id, token);
+                                        alert("Order cancelled successfully");
+                                        setOrders((prev) =>
+                                          prev.map((o) =>
+                                            o.id === order.id
+                                              ? { ...o, isActive: false }
+                                              : o
+                                          )
+                                        );
+                                      } catch (err) {
+                                        alert("Failed to cancel order");
+                                      }
                                     }
+                                  }}
+                                >
+                                  Cancel
+                                </button>
+                              </>
+                            ) : (
+                              <button
+                                className="activate-btn"
+                                onClick={async () => {
+                                  const token =
+                                    localStorage.getItem("adminToken");
+                                  try {
+                                    await activateOrder(order.id, token);
+                                    alert("Order reactivated successfully");
+                                    setOrders((prev) =>
+                                      prev.map((o) =>
+                                        o.id === order.id
+                                          ? { ...o, isActive: true }
+                                          : o
+                                      )
+                                    );
+                                  } catch (err) {
+                                    alert("Failed to activate order");
                                   }
                                 }}
                               >
-                                Cancel
+                                Activate
                               </button>
-                            </>
-                          ) : (
-                            <button
-                              className="activate-btn"
-                              onClick={async () => {
-                                const token = localStorage.getItem('adminToken');
-                                try {
-                                  await activateOrder(order.id, token);
-                                  alert('Order reactivated successfully');
-                                  setOrders((prev) =>
-                                    prev.map((o) => (o.id === order.id ? { ...o, isActive: true } : o))
-                                  );
-                                } catch (err) {
-                                  alert('Failed to activate order');
-                                }
-                              }}
-                            >
-                              Activate
-                            </button>
-                          )}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -173,11 +238,20 @@ export default function AdminOrders() {
       <footer className="footer">
         <h4>Admin Access</h4>
         <div className="footer-details">
-          <p><strong>Yash Turmbekar</strong></p>
-          <p>📞 <a href="tel:+918237381312">+91 82373 81312</a></p>
-          <p>📧 <a href="mailto:yashturmbkar7@gmail.com">yashturmbkar7@gmail.com</a></p>
+          <p>
+            <strong>Yash Turmbekar</strong>
+          </p>
+          <p>
+            📞 <a href="tel:+918237381312">+91 82373 81312</a>
+          </p>
+          <p>
+            📧{" "}
+            <a href="mailto:yashturmbkar7@gmail.com">yashturmbkar7@gmail.com</a>
+          </p>
         </div>
-        <p className="footer-note">© 2025 Mangoes At Your Doorstep | Admin Panel</p>
+        <p className="footer-note">
+          © 2025 Mangoes At Your Doorstep | Admin Panel
+        </p>
       </footer>
     </div>
   );
