@@ -30,12 +30,23 @@ export default function AdminOrders() {
   const handleUpdate = async (orderId, updatedFields) => {
     try {
       const token = localStorage.getItem("adminToken");
-      await updateOrder(orderId, updatedFields, token);
-      setOrders((prev) =>
-        prev.map((order) =>
-          order.id === orderId ? { ...order, ...updatedFields } : order
-        )
-      );
+      const updatedOrder = await updateOrder(orderId, updatedFields, token);
+      console.log("Updated Order:", updatedOrder); // Log the updated order for debugging
+      if (updatedOrder && updatedOrder.lastUpdatedAt) {
+        setOrders((prev) =>
+          prev.map((order) =>
+            order.id === orderId
+              ? {
+                  ...order,
+                  ...updatedFields,
+                  lastUpdatedAt: updatedOrder.lastUpdatedAt,
+                }
+              : order
+          )
+        );
+      } else {
+        alert("Failed to retrieve updated date from the server.");
+      }
     } catch (err) {
       alert("Failed to update order");
     }
@@ -77,6 +88,8 @@ export default function AdminOrders() {
                     <th>Phone</th>
                     <th>Qty</th>
                     <th>Delivery Location</th>
+                    <th>Order Date</th>
+                    <th>Last Updated</th>
                     <th>Order Status</th>
                     <th>Payment Status</th>
                     <th>Action</th>
@@ -84,8 +97,11 @@ export default function AdminOrders() {
                 </thead>
                 <tbody>
                   {orders.map((order, index) => {
-                    const getRowClass = () => {              
-                      if (order.orderStatus === "delivered" && order.paymentStatus === "completed")
+                    const getRowClass = () => {
+                      if (
+                        order.orderStatus === "delivered" &&
+                        order.paymentStatus === "completed"
+                      )
                         return "order-received-payment-completed";
                       if (order.orderStatus === "order_received")
                         return "order-received";
@@ -93,7 +109,11 @@ export default function AdminOrders() {
                         return "in-progress";
                       if (order.orderStatus === "out_for_delivery")
                         return "out-for-delivery";
-                      if (order.orderStatus === "delivered" && order.paymentStatus !== "completed" ) return "delivered";
+                      if (
+                        order.orderStatus === "delivered" &&
+                        order.paymentStatus !== "completed"
+                      )
+                        return "delivered";
                       return "";
                     };
 
@@ -112,7 +132,27 @@ export default function AdminOrders() {
                         <td>{order.phone}</td>
                         <td>{order.quantity}</td>
                         <td>{order.location}</td>
-
+                        <td>{`${new Date(
+                          order.created_at
+                        ).toLocaleDateString()} ${new Date(
+                          order.created_at
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}`}</td>
+                        <td>
+                          {order.lastUpdatedAt &&
+                          !isNaN(new Date(order.lastUpdatedAt).getTime())
+                            ? `${new Date(
+                                order.lastUpdatedAt
+                              ).toLocaleDateString()} ${new Date(
+                                order.lastUpdatedAt
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}`
+                            : "N/A"}
+                        </td>
                         <td>
                           <select
                             value={order.orderStatus || "order_received"}
@@ -137,7 +177,6 @@ export default function AdminOrders() {
                             </option>
                           </select>
                         </td>
-
                         <td>
                           <select
                             value={order.paymentStatus || "pending"}
@@ -154,7 +193,6 @@ export default function AdminOrders() {
                             <option value="completed">Payment Completed</option>
                           </select>
                         </td>
-
                         <td>
                           <div className="action-buttons">
                             {order.isActive ? (
