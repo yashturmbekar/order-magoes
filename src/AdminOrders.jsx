@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   getAllOrders,
   updateOrder,
@@ -10,6 +11,7 @@ export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchOrders = async () => {
@@ -57,8 +59,19 @@ export default function AdminOrders() {
     setOrders(updated);
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/admin/login");
+  };
+
   return (
     <div className="page">
+      <div className="logout-container">
+        <button className="logout-btn" onClick={handleLogout}>
+          Logout
+        </button>
+      </div>
+
       <div className="overlay">
         <div className="hero">
           <p className="tagline">Admin Dashboard</p>

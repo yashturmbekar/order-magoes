@@ -360,6 +360,27 @@ button:hover {
   background-color: #e65100;
 }
 
+/* Logout Button */
+.logout-container {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.logout-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background-color: #ff1a1a;
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .orders-table {
