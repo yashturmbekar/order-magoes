@@ -6,11 +6,17 @@ import {
   cancelOrder,
   activateOrder,
 } from "./utils/api";
+import Popup from "./utils/Popup";
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [popupMessage, setPopupMessage] = useState(null);
+  const [confirmation, setConfirmation] = useState({
+    show: false,
+    onConfirm: null,
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,11 +51,45 @@ export default function AdminOrders() {
               : order
           )
         );
+        setPopupMessage("Order updated successfully");
       } else {
-        alert("Failed to retrieve updated date from the server.");
+        setPopupMessage("Failed to retrieve updated date from the server.");
       }
     } catch (err) {
-      alert("Failed to update order");
+      setPopupMessage("Failed to update order");
+    }
+  };
+
+  const handleCancel = async (orderId) => {
+    setConfirmation({
+      show: true,
+      onConfirm: async () => {
+        const token = localStorage.getItem("adminToken");
+        try {
+          await cancelOrder(orderId, token);
+          setPopupMessage("Order cancelled successfully");
+          setOrders((prev) =>
+            prev.map((o) => (o.id === orderId ? { ...o, isActive: false } : o))
+          );
+        } catch (err) {
+          setPopupMessage("Failed to cancel order");
+        } finally {
+          setConfirmation({ show: false, onConfirm: null });
+        }
+      },
+    });
+  };
+
+  const handleActivate = async (orderId) => {
+    const token = localStorage.getItem("adminToken");
+    try {
+      await activateOrder(orderId, token);
+      setPopupMessage("Order reactivated successfully");
+      setOrders((prev) =>
+        prev.map((o) => (o.id === orderId ? { ...o, isActive: true } : o))
+      );
+    } catch (err) {
+      setPopupMessage("Failed to activate order");
     }
   };
 
@@ -66,6 +106,26 @@ export default function AdminOrders() {
 
   return (
     <div className="page">
+      {popupMessage && (
+        <Popup message={popupMessage} onClose={() => setPopupMessage(null)} />
+      )}
+
+      {confirmation.show && (
+        <Popup
+          message="Are you sure you want to cancel this order?"
+          hideCloseButton={true}
+          onClose={() => setConfirmation({ show: false, onConfirm: null })}
+        >
+          <button onClick={confirmation.onConfirm}>Yes</button>
+          <button
+            className="cancel-btn"
+            onClick={() => setConfirmation({ show: false, onConfirm: null })}
+          >
+            No
+          </button>
+        </Popup>
+      )}
+
       <div className="logout-container">
         <button className="logout-btn" onClick={handleLogout}>
           Logout
@@ -222,29 +282,7 @@ export default function AdminOrders() {
                                 </button>
                                 <button
                                   className="cancel-btn"
-                                  onClick={async () => {
-                                    const token =
-                                      localStorage.getItem("adminToken");
-                                    if (
-                                      window.confirm(
-                                        "Are you sure you want to cancel this order?"
-                                      )
-                                    ) {
-                                      try {
-                                        await cancelOrder(order.id, token);
-                                        alert("Order cancelled successfully");
-                                        setOrders((prev) =>
-                                          prev.map((o) =>
-                                            o.id === order.id
-                                              ? { ...o, isActive: false }
-                                              : o
-                                          )
-                                        );
-                                      } catch (err) {
-                                        alert("Failed to cancel order");
-                                      }
-                                    }
-                                  }}
+                                  onClick={() => handleCancel(order.id)}
                                 >
                                   Cancel order
                                 </button>
@@ -252,23 +290,7 @@ export default function AdminOrders() {
                             ) : (
                               <button
                                 className="activate-btn"
-                                onClick={async () => {
-                                  const token =
-                                    localStorage.getItem("adminToken");
-                                  try {
-                                    await activateOrder(order.id, token);
-                                    alert("Order reactivated successfully");
-                                    setOrders((prev) =>
-                                      prev.map((o) =>
-                                        o.id === order.id
-                                          ? { ...o, isActive: true }
-                                          : o
-                                      )
-                                    );
-                                  } catch (err) {
-                                    alert("Failed to activate order");
-                                  }
-                                }}
+                                onClick={() => handleActivate(order.id)}
                               >
                                 Activate
                               </button>
