@@ -1,0 +1,239 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: #fffdf4;
+  line-height: 1.6;
+}
+
+.page {
+  min-height: 100vh;
+  background-image: url("/mango-bg.jpg"); /* add image in public folder */
+  background-size: cover;
+  background-position: center;
+  padding: 2rem 1rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.falling-mangoes {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  overflow: visible;
+  z-index: 9999;
+}
+
+.mango {
+  position: absolute;
+  top: -60px;
+  opacity: 0.95;
+  animation-name: drop;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0.38, 1.17);
+  animation-fill-mode: forwards;
+  animation-duration: 3s;
+}
+
+@keyframes drop {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(90vh) rotate(360deg);
+    opacity: 1;
+  }
+}
+
+
+/* Main content block */
+.overlay {
+  background: rgba(255, 255, 255, 0.5); /* Reduced opacity */
+  backdrop-filter: blur(6px);           /* Optional: adjust for softer blur */
+  padding: 2rem;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
+  z-index: 20;
+}
+
+
+/* Header */
+.hero {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.tagline {
+  font-family: "Baloo 2", cursive;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #4e342e;
+}
+
+h1 {
+  font-family: "Pacifico", cursive;
+  font-size: 2.2rem;
+  color: #d35400;
+  margin: 0.3rem 0;
+}
+
+.highlight {
+  color: #ff7043;
+}
+
+.subtitle {
+  font-size: 1rem;
+  color: #2e7d32;
+  background: #e9f5e9;
+  padding: 6px 16px;
+  border-radius: 50px;
+  display: inline-block;
+}
+
+/* About section */
+.about-mangoes {
+  background-color: #fff8dc;
+  padding: 1rem;
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+}
+
+.about-mangoes h3 {
+  font-size: 1.2rem;
+  color: #e65100;
+}
+
+.about-mangoes p {
+  font-size: 0.95rem;
+  color: #444;
+}
+
+/* Form */
+.form-card {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-card h2 {
+  font-size: 1.3rem;
+  color: #e65100;
+  text-align: center;
+}
+
+input,
+textarea {
+  width: 100%;
+  padding: 0.9rem;
+  font-size: 1rem;
+  border: 2px solid #ffd54f;
+  border-radius: 10px;
+  background: #fffefb;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+input:focus,
+textarea:focus {
+  border-color: #ffb300;
+}
+
+textarea {
+  resize: none;
+  height: 80px;
+}
+
+button {
+  background: #ff9800;
+  color: white;
+  font-weight: bold;
+  padding: 1rem;
+  border: none;
+  border-radius: 10px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+button:hover {
+  background: #e65100;
+}
+
+/* Errors */
+.error {
+  color: #d32f2f;
+  font-size: 0.9rem;
+  margin-top: -0.5rem;
+  margin-bottom: 0.5rem;
+  text-align: left;
+  padding-left: 0.3rem;
+}
+
+.footer {
+  background: rgba(255, 255, 255, 0.5); /* match .overlay opacity */
+  backdrop-filter: blur(6px);           /* same blur effect */
+  border-top: 2px dashed #ffe082;
+  padding: 2rem 1rem;
+  margin-top: 2rem;
+  text-align: center;
+  font-size: 0.95rem;
+  color: #333;
+  border-radius: 16px;
+  max-width: 480px;
+  width: 100%;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+}
+
+.footer h4 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+  color: #e67e22;
+}
+
+.footer a {
+  color: #e67e22;
+  text-decoration: none;
+}
+
+.footer a:hover {
+  text-decoration: underline;
+}
+
+.footer-note {
+  font-size: 0.8rem;
+  color: #888;
+  margin-top: 1rem;
+}
+
+
+/* Mobile responsive */
+@media (max-width: 480px) {
+  h1 {
+    font-size: 1.7rem;
+  }
+
+  .tagline {
+    font-size: 1rem;
+  }
+
+  .form-card h2 {
+    font-size: 1.1rem;
+  }
+
+  .overlay {
+    padding: 1.2rem;
+  }
+}
