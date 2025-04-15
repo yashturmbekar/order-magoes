@@ -31,7 +31,6 @@ export default function AdminOrders() {
     try {
       const token = localStorage.getItem("adminToken");
       const updatedOrder = await updateOrder(orderId, updatedFields, token);
-      console.log("Updated Order:", updatedOrder); // Log the updated order for debugging
       if (updatedOrder && updatedOrder.lastUpdatedAt) {
         setOrders((prev) =>
           prev.map((order) =>
