@@ -52,21 +52,6 @@ export default function AdminLogin() {
           <button onClick={handleLogin}>Login</button>
           <div style={{ marginTop: "2rem" }}></div>
         </div>
-
-        <div className="about-mangoes">
-          <h3>Empowering Admins</h3>
-          <p>
-            🛠️ Secure login to access all incoming mango orders in real-time.
-          </p>
-          <p>
-            📊 Track order trends, view details, and manage customer data with
-            ease.
-          </p>
-          <p>
-            ✅ Keep the delivery process smooth and professional for every mango
-            lover in Pune.
-          </p>
-        </div>
       </div>
 
       <footer className="footer">
