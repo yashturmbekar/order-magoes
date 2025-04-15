@@ -1,10 +1,12 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import App from "./App";
-import "./style.css";
+import React from 'react';
+import ReactDOM from 'react-dom/client'; // ✅ Updated import
+import AppRouter from './AppRouter';
+import './style.css';
 
-ReactDOM.createRoot(document.getElementById("root")).render(
+const root = ReactDOM.createRoot(document.getElementById('root')); // ✅ React 18 method
+root.render(
   <React.StrictMode>
-    <App />
+    <AppRouter />
   </React.StrictMode>
 );
+

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { apiRequest } from "./utils/api"; // Global API handler
+import { createOrder } from "./utils/api";
 
-export default function App() {
+export default function LandingPage() {
   const [form, setForm] = useState({ name: "", phone: "", quantity: "", location: "" });
   const [errors, setErrors] = useState({});
   const [showAnimation, setShowAnimation] = useState(true);
@@ -30,11 +30,11 @@ export default function App() {
       phone: form.phone,
       quantity: parseInt(form.quantity),
       location: form.location,
-      status: 'new'
+      status: 'New Order'
     };
 
     try {
-      await apiRequest("/orders", "POST", order);
+      await createOrder(order);
       const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
       const url = `https://wa.me/918830997757?text=${encodeURIComponent(message)}`;
       window.open(url, "_blank");
@@ -114,20 +114,13 @@ export default function App() {
           {errors.location && <div className="error">{errors.location}</div>}
 
           <button onClick={handleSubmit}>Order on WhatsApp</button>
-          <div style={{ marginTop: '2rem' }}></div>
         </div>
 
         <div className="about-mangoes">
           <h3>Why Choose Our Mangoes?</h3>
-          <p>
-            🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked at the peak of ripeness and naturally matured without chemicals.
-          </p>
-          <p>
-            🚚 Delivered farm-fresh across Pune and nearby areas, each box is a promise of authenticity and aroma straight from the Konkan soil.
-          </p>
-          <p>
-            🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed
-          </p>
+          <p>🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked...</p>
+          <p>🚚 Delivered farm-fresh across Pune and nearby areas...</p>
+          <p>🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed</p>
         </div>
       </div>
 

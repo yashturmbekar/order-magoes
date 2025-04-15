@@ -1,3 +1,4 @@
+/* Reset & Base */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -5,14 +6,14 @@
 }
 
 body {
-  font-family: 'Nunito', sans-serif;
+  font-family: "Nunito", sans-serif;
   background-color: #fffdf4;
   line-height: 1.6;
 }
 
 .page {
   min-height: 100vh;
-  background-image: url("/mango-bg.jpg"); /* add image in public folder */
+  background-image: url("/mango-bg.jpg");
   background-size: cover;
   background-position: center;
   padding: 2rem 1rem;
@@ -54,21 +55,19 @@ body {
   }
 }
 
-
-/* Main content block */
+/* Overlay */
 .overlay {
-  background: rgba(255, 255, 255, 0.5); /* Reduced opacity */
-  backdrop-filter: blur(6px);           /* Optional: adjust for softer blur */
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
   padding: 2rem;
   border-radius: 16px;
-  max-width: 480px;
   width: 100%;
+  max-width: 480px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15);
   z-index: 20;
 }
 
-
-/* Header */
+/* Hero */
 .hero {
   text-align: center;
   margin-bottom: 1.5rem;
@@ -101,12 +100,12 @@ h1 {
   display: inline-block;
 }
 
-/* About section */
+/* About Section */
 .about-mangoes {
   background-color: #fff8dc;
   padding: 1rem;
   border-radius: 12px;
-  margin-bottom: 1.5rem;
+  margin-top: 2rem;
   text-align: center;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
@@ -121,11 +120,12 @@ h1 {
   color: #444;
 }
 
-/* Form */
+/* Form Card */
 .form-card {
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  padding: 1rem 0;
 }
 
 .form-card h2 {
@@ -172,7 +172,7 @@ button:hover {
   background: #e65100;
 }
 
-/* Errors */
+/* Error */
 .error {
   color: #d32f2f;
   font-size: 0.9rem;
@@ -182,9 +182,10 @@ button:hover {
   padding-left: 0.3rem;
 }
 
+/* Footer */
 .footer {
-  background: rgba(255, 255, 255, 0.5); /* match .overlay opacity */
-  backdrop-filter: blur(6px);           /* same blur effect */
+  background: rgba(255, 255, 255, 0.5);
+  backdrop-filter: blur(6px);
   border-top: 2px dashed #ffe082;
   padding: 2rem 1rem;
   margin-top: 2rem;
@@ -192,8 +193,8 @@ button:hover {
   font-size: 0.95rem;
   color: #333;
   border-radius: 16px;
-  max-width: 480px;
   width: 100%;
+  max-width: 480px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
 }
 
@@ -218,8 +219,110 @@ button:hover {
   margin-top: 1rem;
 }
 
+/* Table Wrapper */
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
 
-/* Mobile responsive */
+/* Orders Table */
+.orders-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  font-size: 0.95rem;
+}
+
+.orders-table th,
+.orders-table td {
+  border: 1px solid #ddd;
+  padding: 0.8rem;
+  text-align: center;
+}
+
+.orders-table th {
+  background-color: #f3a847;
+  color: white;
+}
+
+.orders-table tr:nth-child(even) {
+  background-color: #fdf5e6;
+}
+
+/* Cancelled row style */
+.orders-table tr.inactive {
+  background-color: #ffeaea;
+  color: #999;
+}
+
+/* Dropdowns */
+.orders-table select {
+  padding: 0.5rem;
+  font-size: 0.95rem;
+  border: 2px solid #ffd54f;
+  border-radius: 8px;
+  background: #fffefb;
+  outline: none;
+  transition: border 0.3s ease;
+}
+
+.orders-table select:focus {
+  border-color: #ffb300;
+}
+
+/* Action Buttons */
+.action-buttons {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.action-buttons button {
+  padding: 0.6rem 1rem;
+  font-size: 0.95rem;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.action-buttons button:hover {
+  opacity: 0.95;
+}
+
+.cancel-btn {
+  background-color: #d32f2f;
+  color: white;
+}
+
+.cancel-btn:hover {
+  background-color: #b71c1c;
+}
+
+.update-btn {
+  background-color: #ff9800;
+  color: white;
+}
+
+.update-btn:hover {
+  background-color: #e65100;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .orders-table {
+    font-size: 0.85rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 0.6rem;
+  }
+}
+
 @media (max-width: 480px) {
   h1 {
     font-size: 1.7rem;
@@ -235,5 +338,151 @@ button:hover {
 
   .overlay {
     padding: 1.2rem;
+  }
+}
+
+/* Responsive Design */
+/* Laptop/Desktop */
+@media screen and (min-width: 1024px) {
+  .page {
+    padding: 3rem 2rem;
+  }
+
+  .overlay {
+    max-width: 800px;
+  }
+
+  .hero h1 {
+    font-size: 3rem;
+  }
+
+  .tagline {
+    font-size: 1.5rem;
+  }
+
+  .form-card {
+    padding: 2rem 0;
+  }
+
+  .footer {
+    max-width: 800px;
+  }
+}
+
+/* Tablet */
+@media screen and (max-width: 1023px) and (min-width: 768px) {
+  .overlay {
+    max-width: 600px;
+  }
+
+  .hero h1 {
+    font-size: 2.5rem;
+  }
+}
+
+/* Mobile Improvements */
+@media screen and (max-width: 767px) {
+  .page {
+    padding: 1rem 0.8rem;
+  }
+
+  .overlay {
+    padding: 1rem;
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+  }
+
+  .hero h1 {
+    font-size: 1.8rem;
+  }
+
+  .tagline {
+    font-size: 1rem;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    padding: 4px 12px;
+  }
+
+  .form-card {
+    gap: 0.8rem;
+  }
+
+  input,
+  textarea {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  button {
+    padding: 0.8rem;
+    font-size: 0.95rem;
+  }
+
+  .about-mangoes {
+    padding: 0.8rem;
+    margin-top: 1.5rem;
+  }
+
+  .about-mangoes h3 {
+    font-size: 1.1rem;
+  }
+
+  .about-mangoes p {
+    font-size: 0.9rem;
+  }
+
+  .footer {
+    padding: 1.5rem 1rem;
+    margin-top: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Improve table responsiveness on mobile */
+  .table-wrapper {
+    margin: 0 -0.8rem;
+    padding: 0 0.8rem;
+  }
+
+  .orders-table {
+    font-size: 0.8rem;
+  }
+
+  .orders-table th,
+  .orders-table td {
+    padding: 0.5rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 0.3rem;
+  }
+
+  .action-buttons button {
+    width: 100%;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Small Mobile */
+@media screen and (max-width: 360px) {
+  .hero h1 {
+    font-size: 1.5rem;
+  }
+
+  .tagline {
+    font-size: 0.9rem;
+  }
+
+  .overlay {
+    padding: 0.8rem;
+  }
+
+  input,
+  textarea,
+  button {
+    font-size: 0.9rem;
   }
 }
