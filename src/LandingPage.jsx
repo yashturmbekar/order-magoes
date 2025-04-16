@@ -18,10 +18,10 @@ export default function LandingPage() {
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(true);
   const photos = [
-    "/public/real-mango-1.jpg",
-    "/public/real-mango-2.jpg",
-    "/public/real-mango-3.jpg",
-    "/public/real-mango-4.jpg",
+    "/real-mango-1.jpg",
+    "/real-mango-2.jpg",
+    "/real-mango-3.JPG",
+    "/real-mango-4.jpg",
   ];
 
   const photosWithDuplicates = [
@@ -37,26 +37,11 @@ export default function LandingPage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPhotoIndex((prevIndex) => {
-        if (prevIndex === photos.length - 1) {
-          setIsTransitioning(false); // Disable transition for seamless reset
-          return 0; // Reset to the first photo
-        }
-        setIsTransitioning(true); // Enable transition for normal sliding
-        return prevIndex + 1;
-      });
-    }, 3000);
+      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
+    }, 3000); // Automatically move to the next photo every 3 seconds
 
     return () => clearInterval(interval);
   }, [photos.length]);
-
-  useEffect(() => {
-    if (currentPhotoIndex === photosWithDuplicates.length - 1) {
-      setTimeout(() => {
-        setCurrentPhotoIndex(1); // Reset to the first actual photo without animation
-      }, 0); // Instantly reset to create a seamless loop
-    }
-  }, [currentPhotoIndex, photosWithDuplicates.length]);
 
   const validate = () => {
     const newErrors = {};
