@@ -82,9 +82,10 @@ export async function getOrderByPhone(phoneNumber) {
 }
 
 export async function updateOrder(orderId, orderData, token) {
-  return await api.patch(`/admin/orders/${orderId}`, orderData, {
+  const response = await api.patch(`/admin/orders/${orderId}`, orderData, {
     headers: { Authorization: `Bearer ${token}` },
   });
+  return response.data; // Ensure the response data is returned, including lastUpdatedAt
 }
 
 export async function createOrder(data) {
