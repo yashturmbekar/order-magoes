@@ -137,7 +137,10 @@ export default function AdminOrders() {
       <div className="overlay">
         <div className="hero">
           <p className="tagline">Admin Dashboard</p>
-          <h1>
+          <h1
+            onClick={() => (window.location.href = "/")}
+            style={{ cursor: "pointer" }}
+          >
             Mangoes <span className="highlight">At</span>
             <br />
             <span className="highlight">Your Doorstep</span>

@@ -445,6 +445,19 @@ button:hover {
   .orders-table td {
     padding: 0.6rem;
   }
+
+  #order-image,
+  #details-image {
+    width: 120px; /* Smaller size for mobile view */
+    height: 120px;
+    transition: transform 1.2s ease; /* Smooth scaling transition */
+  }
+
+  #order-image:hover,
+  #details-image:hover {
+    transform: scale(1.1); /* Slightly smaller scale on hover for mobile */
+    overflow: hidden; /* Prevent scaling out of the box */
+  }
 }
 
 @media (max-width: 480px) {
