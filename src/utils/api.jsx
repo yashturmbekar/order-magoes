@@ -77,10 +77,8 @@ export async function getAllOrders(token) {
   });
 }
 
-export async function getOrderByPhone(phoneNumber, token) {
-  return await api.get(`/orders/phone/${phoneNumber}`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
+export async function getOrderByPhone(phoneNumber) {
+  return await api.get(`/admin/orders/details/${phoneNumber}`);
 }
 
 export async function updateOrder(orderId, orderData, token) {
