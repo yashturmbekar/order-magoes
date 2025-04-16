@@ -68,8 +68,16 @@ export default function AdminOrders() {
         try {
           await cancelOrder(orderId, token);
           setPopupMessage("Order cancelled successfully");
-          setOrders((prev) =>
-            prev.map((o) => (o.id === orderId ? { ...o, isActive: false } : o))
+          setOrders((prevOrders) =>
+            prevOrders.map((order) =>
+              order.id === orderId
+                ? {
+                    ...order,
+                    isActive: false,
+                    lastUpdatedAt: new Date().toISOString(),
+                  }
+                : order
+            )
           );
         } catch (err) {
           setPopupMessage("Failed to cancel order");
@@ -85,8 +93,16 @@ export default function AdminOrders() {
     try {
       await activateOrder(orderId, token);
       setPopupMessage("Order reactivated successfully");
-      setOrders((prev) =>
-        prev.map((o) => (o.id === orderId ? { ...o, isActive: true } : o))
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.id === orderId
+            ? {
+                ...order,
+                isActive: true,
+                lastUpdatedAt: new Date().toISOString(),
+              }
+            : order
+        )
       );
     } catch (err) {
       setPopupMessage("Failed to activate order");
