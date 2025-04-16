@@ -14,6 +14,7 @@ export default function LandingPage() {
   const [userOrders, setUserOrders] = useState([]);
   const [phoneForDetails, setPhoneForDetails] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
+  const [activeSection, setActiveSection] = useState(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowAnimation(false), 3000);
@@ -73,48 +74,11 @@ export default function LandingPage() {
     }
   };
 
-  return (
-    <div className="page">
-      {showAnimation && (
-        <div className="falling-mangoes">
-          {Array.from({ length: 50 }).map((_, i) => {
-            const left = Math.random() * 100;
-            const delay = Math.random() * 4;
-            const duration = 4 + Math.random() * 3;
-            const size = 25 + Math.random() * 20;
-            return (
-              <img
-                key={i}
-                src="/mango-icon.png"
-                className="mango"
-                style={{
-                  left: `${left}%`,
-                  width: `${size}px`,
-                  animationDelay: `${delay}s`,
-                  animationDuration: `${duration}s`,
-                  animationFillMode: "forwards",
-                  position: "absolute",
-                }}
-              />
-            );
-          })}
-        </div>
-      )}
-
-      <div className="overlay">
-        <div className="hero">
-          <p className="tagline">यह बात सिर्फ आम ही नहीं, काम की भी है!</p>
-          <h1>
-            Mangoes <span className="highlight">At</span>
-            <br />
-            <span className="highlight">Your Doorstep</span>
-          </h1>
-          <p className="subtitle">Anywhere in Pune</p>
-        </div>
-
+  const renderSection = () => {
+    if (activeSection === "order") {
+      return (
         <div className="form-card">
           <h2>Order Ratnagiri Hapus Mangoes</h2>
-
           <input
             placeholder="Your Name"
             value={form.name}
@@ -150,19 +114,15 @@ export default function LandingPage() {
           />
           {errors.location && <div className="error">{errors.location}</div>}
 
-          <input
-            placeholder="Enter Your Mobile Number for Orders"
-            value={form.phone}
-            onChange={(e) => {
-              if (/^\d{0,10}$/.test(e.target.value)) {
-                setForm({ ...form, phone: e.target.value });
-              }
-            }}
-          />
           <button onClick={handleSubmit}>Order on WhatsApp</button>
-
+        </div>
+      );
+    } else if (activeSection === "details") {
+      return (
+        <div className="form-card">
+          <h2>Get Order Details</h2>
           <input
-            placeholder="Enter Your Mobile Number to View Details"
+            placeholder="Enter Your Mobile Number"
             value={phoneForDetails}
             onChange={(e) => {
               if (/^\d{0,10}$/.test(e.target.value)) {
@@ -283,6 +243,187 @@ export default function LandingPage() {
             </div>
           )}
         </div>
+      );
+    }
+    return null;
+  };
+
+  return (
+    <div className="page">
+      {showAnimation && (
+        <div className="falling-mangoes">
+          {Array.from({ length: 50 }).map((_, i) => {
+            const left = Math.random() * 100;
+            const delay = Math.random() * 4;
+            const duration = 4 + Math.random() * 3;
+            const size = 25 + Math.random() * 20;
+            return (
+              <img
+                key={i}
+                src="/mango-icon.png"
+                className="mango"
+                style={{
+                  left: `${left}%`,
+                  width: `${size}px`,
+                  animationDelay: `${delay}s`,
+                  animationDuration: `${duration}s`,
+                  animationFillMode: "forwards",
+                  position: "absolute",
+                }}
+              />
+            );
+          })}
+        </div>
+      )}
+
+      <div className="overlay">
+        <div className="hero">
+          <p className="tagline">यह बात सिर्फ आम ही नहीं, काम की भी है!</p>
+          <h1>
+            Mangoes <span className="highlight">At</span>
+            <br />
+            <span className="highlight">Your Doorstep</span>
+          </h1>
+          <p className="subtitle">Anywhere in Pune</p>
+        </div>
+
+        <div
+          className="button-group"
+          style={{
+            display: "flex",
+            gap: "20px",
+            justifyContent: "center",
+            marginTop: "20px",
+          }}
+        >
+          <button
+            className={`fancy-button mango-button ${
+              activeSection === "order" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("order")}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 1.2s ease", // This transition will apply to the button itself (and its children)
+            }}
+            onMouseEnter={() => {
+              // Apply scale to both the image and text when mouse enters button
+              document.getElementById("order-image").style.transform =
+                "scale(1.5)";
+              document.getElementById("order-text").style.transform =
+                "scale(1.5)";
+            }}
+            onMouseLeave={() => {
+              // Reset scale for both image and text when mouse leaves button
+              document.getElementById("order-image").style.transform =
+                "scale(1)";
+              document.getElementById("order-text").style.transform =
+                "scale(1)";
+            }}
+          >
+            <img
+              id="order-image"
+              src="/order-magoes.png"
+              alt="Order Mangoes"
+              style={{
+                width: "150px",
+                height: "150px",
+                transition: "transform 1.2s ease", // Smooth scaling transition for image
+              }}
+            />
+            <div
+              id="order-text"
+              style={{
+                textAlign: "center",
+                marginTop: "10px",
+                transition: "transform 1.2s ease", // Smooth scaling transition for text
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  color: "#ff4500", // Updated button text color to a vibrant orange-red
+                  fontFamily: "'Nunito', sans-serif", // Updated font for button text
+                  animation: "fadeInText 1.2s ease-in-out",
+                  marginTop: "10px",
+                }}
+              >
+                Order Mangoes
+              </p>
+            </div>
+          </button>
+
+          <button
+            className={`fancy-button mango-button ${
+              activeSection === "details" ? "active" : ""
+            }`}
+            onClick={() => setActiveSection("details")}
+            style={{
+              background: "none",
+              border: "none",
+              cursor: "pointer",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              justifyContent: "center",
+              transition: "transform 1.2s ease", // This transition will apply to the button itself (and its children)
+            }}
+            onMouseEnter={() => {
+              // Apply scale to both the image and text when mouse enters button
+              document.getElementById("details-image").style.transform =
+                "scale(1.5)";
+              document.getElementById("details-text").style.transform =
+                "scale(1.5)";
+            }}
+            onMouseLeave={() => {
+              // Reset scale for both image and text when mouse leaves button
+              document.getElementById("details-image").style.transform =
+                "scale(1)";
+              document.getElementById("details-text").style.transform =
+                "scale(1)";
+            }}
+          >
+            <img
+              id="details-image"
+              src="/get-order-details.png"
+              alt="Get Order Details"
+              style={{
+                width: "150px",
+                height: "150px",
+                transition: "transform 1.2s ease", // Smooth scaling transition for image
+              }}
+            />
+            <div
+              id="details-text"
+              style={{
+                textAlign: "center",
+                marginTop: "10px",
+                transition: "transform 1.2s ease", // Smooth scaling transition for text
+              }}
+            >
+              <p
+                style={{
+                  fontSize: "18px",
+                  fontWeight: "bold",
+                  color: "#ff4500", // Updated button text color to a vibrant orange-red
+                  fontFamily: "'Nunito', sans-serif", // Updated font for button text
+                  animation: "fadeInText 1.2s ease-in-out",
+                  marginTop: "10px",
+                }}
+              >
+                Get Order Details
+              </p>
+            </div>
+          </button>
+        </div>
+
+        {renderSection()}
 
         <div className="about-mangoes">
           <h3>Why Choose Our Mangoes?</h3>
