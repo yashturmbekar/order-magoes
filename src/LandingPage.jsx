@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createOrder, getOrderByPhone } from "./utils/api";
+import Popup from "./utils/Popup";
 
 export default function LandingPage() {
   const [form, setForm] = useState({
@@ -12,6 +13,7 @@ export default function LandingPage() {
   const [showAnimation, setShowAnimation] = useState(true);
   const [userOrders, setUserOrders] = useState([]);
   const [phoneForDetails, setPhoneForDetails] = useState("");
+  const [popupMessage, setPopupMessage] = useState("");
 
   useEffect(() => {
     const timer = setTimeout(() => setShowAnimation(false), 3000);
@@ -58,6 +60,13 @@ export default function LandingPage() {
   const handleGetOrders = async () => {
     try {
       const orders = await getOrderByPhone(phoneForDetails);
+      if (orders.data.length === 0) {
+        setUserOrders([]); // Clear old orders from the UI
+        setPopupMessage(
+          "0 active orders found for this mobile number. Please use a different mobile number."
+        );
+        return;
+      }
       setUserOrders(orders.data);
     } catch (err) {
       alert("Failed to fetch orders: " + err.message);
@@ -181,65 +190,94 @@ export default function LandingPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {userOrders.map((order, index) => (
-                    <tr key={order.id}>
-                      <td>{index + 1}</td>
-                      <td>{order.orderId}</td>
-                      <td>{order.name}</td>
-                      <td>{order.phone}</td>
-                      <td>{order.quantity}</td>
-                      <td>{order.location}</td>
-                      <td>{`${new Date(
-                        order.created_at
-                      ).toLocaleDateString()} ${new Date(
-                        order.created_at
-                      ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}`}</td>
-                      <td>
-                        {order.lastUpdatedAt &&
-                        !isNaN(new Date(order.lastUpdatedAt).getTime())
-                          ? `${new Date(
-                              order.lastUpdatedAt
-                            ).toLocaleDateString()} ${new Date(
-                              order.lastUpdatedAt
-                            ).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}`
-                          : "N/A"}
-                      </td>
-                      <td>
-                        {(() => {
-                          switch (order.orderStatus) {
-                            case "order_received":
-                              return "Order Received";
-                            case "in_progress":
-                              return "In Progress";
-                            case "out_for_delivery":
-                              return "Out for Delivery";
-                            case "delivered":
-                              return "Delivered Successfully";
-                            default:
-                              return "Unknown";
-                          }
-                        })()}
-                      </td>
-                      <td>
-                        {(() => {
-                          switch (order.paymentStatus) {
-                            case "pending":
-                              return "Payment Pending";
-                            case "completed":
-                              return "Payment Completed";
-                            default:
-                              return "Unknown";
-                          }
-                        })()}
-                      </td>
-                    </tr>
-                  ))}
+                  {userOrders.map((order, index) => {
+                    const getRowClass = () => {
+                      if (
+                        order.orderStatus === "delivered" &&
+                        order.paymentStatus === "completed"
+                      )
+                        return "order-received-payment-completed";
+                      if (order.orderStatus === "order_received")
+                        return "order-received";
+                      if (order.orderStatus === "in_progress")
+                        return "in-progress";
+                      if (order.orderStatus === "out_for_delivery")
+                        return "out-for-delivery";
+                      if (
+                        order.orderStatus === "delivered" &&
+                        order.paymentStatus !== "completed"
+                      )
+                        return "delivered";
+                      return "";
+                    };
+
+                    const rowClass = getRowClass();
+
+                    return (
+                      <tr
+                        key={order.id}
+                        className={`${rowClass} ${
+                          order.isActive === false ? "inactive" : ""
+                        }`}
+                      >
+                        <td>{index + 1}</td>
+                        <td>{order.orderId}</td>
+                        <td>{order.name}</td>
+                        <td>{order.phone}</td>
+                        <td>{order.quantity}</td>
+                        <td>{order.location}</td>
+                        <td>{`${new Date(
+                          order.created_at
+                        ).toLocaleDateString()} ${new Date(
+                          order.created_at
+                        ).toLocaleTimeString([], {
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        })}`}</td>
+                        <td>
+                          {order.lastUpdatedAt &&
+                          !isNaN(new Date(order.lastUpdatedAt).getTime())
+                            ? `${new Date(
+                                order.lastUpdatedAt
+                              ).toLocaleDateString()} ${new Date(
+                                order.lastUpdatedAt
+                              ).toLocaleTimeString([], {
+                                hour: "2-digit",
+                                minute: "2-digit",
+                              })}`
+                            : "N/A"}
+                        </td>
+                        <td>
+                          {(() => {
+                            switch (order.orderStatus) {
+                              case "order_received":
+                                return "Order Received";
+                              case "in_progress":
+                                return "In Progress";
+                              case "out_for_delivery":
+                                return "Out for Delivery";
+                              case "delivered":
+                                return "Delivered Successfully";
+                              default:
+                                return "Unknown";
+                            }
+                          })()}
+                        </td>
+                        <td>
+                          {(() => {
+                            switch (order.paymentStatus) {
+                              case "pending":
+                                return "Payment Pending";
+                              case "completed":
+                                return "Payment Completed";
+                              default:
+                                return "Unknown";
+                            }
+                          })()}
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
@@ -253,6 +291,10 @@ export default function LandingPage() {
           <p>🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed</p>
         </div>
       </div>
+
+      {popupMessage && (
+        <Popup message={popupMessage} onClose={() => setPopupMessage("")} />
+      )}
 
       <footer className="footer">
         <h4>Get in Touch</h4>
