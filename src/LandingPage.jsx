@@ -15,11 +15,48 @@ export default function LandingPage() {
   const [phoneForDetails, setPhoneForDetails] = useState("");
   const [popupMessage, setPopupMessage] = useState("");
   const [activeSection, setActiveSection] = useState(null);
+  const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
+  const [isTransitioning, setIsTransitioning] = useState(true);
+  const photos = [
+    "/public/real-mango-1.jpg",
+    "/public/real-mango-2.jpg",
+    "/public/real-mango-3.jpg",
+    "/public/real-mango-4.jpg",
+  ];
+
+  const photosWithDuplicates = [
+    photos[photos.length - 1], // Add the last photo at the beginning for smooth looping
+    ...photos,
+    photos[0], // Add the first photo at the end for smooth looping
+  ];
 
   useEffect(() => {
     const timer = setTimeout(() => setShowAnimation(false), 3000);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentPhotoIndex((prevIndex) => {
+        if (prevIndex === photos.length - 1) {
+          setIsTransitioning(false); // Disable transition for seamless reset
+          return 0; // Reset to the first photo
+        }
+        setIsTransitioning(true); // Enable transition for normal sliding
+        return prevIndex + 1;
+      });
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [photos.length]);
+
+  useEffect(() => {
+    if (currentPhotoIndex === photosWithDuplicates.length - 1) {
+      setTimeout(() => {
+        setCurrentPhotoIndex(1); // Reset to the first actual photo without animation
+      }, 0); // Instantly reset to create a seamless loop
+    }
+  }, [currentPhotoIndex, photosWithDuplicates.length]);
 
   const validate = () => {
     const newErrors = {};
@@ -279,7 +316,10 @@ export default function LandingPage() {
       <div className="overlay">
         <div className="hero">
           <p className="tagline">यह बात सिर्फ आम ही नहीं, काम की भी है!</p>
-          <h1 onClick={() => window.location.href = "/"} style={{ cursor: "pointer" }}>
+          <h1
+            onClick={() => (window.location.href = "/")}
+            style={{ cursor: "pointer" }}
+          >
             Mangoes <span className="highlight">At</span>
             <br />
             <span className="highlight">Your Doorstep</span>
@@ -430,6 +470,48 @@ export default function LandingPage() {
           <p>🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked...</p>
           <p>🚚 Delivered farm-fresh across Pune and nearby areas...</p>
           <p>🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed</p>
+
+          <div
+            className="photo-carousel"
+            style={{
+              display: "flex",
+              overflow: "hidden",
+              width: "100%",
+              maxWidth: "900px",
+              margin: "20px auto 0",
+            }}
+          >
+            <div
+              className="carousel-track"
+              style={{
+                display: "flex",
+                transition: isTransitioning
+                  ? "transform 0.5s ease-in-out"
+                  : "none",
+                transform: `translateX(-${
+                  (currentPhotoIndex % photosWithDuplicates.length) * 33.33
+                }%)`, // Ensures looping effect
+              }}
+            >
+              {photosWithDuplicates.map((src, index) => (
+                <img
+                  key={index}
+                  src={src}
+                  alt={`Mango photo ${index + 1}`}
+                  style={{
+                    width: "33.33%",
+                    flexShrink: 0,
+                    height: "auto",
+                    borderRadius: "10px",
+                    marginTop: "20px", // Added space between text and images
+                    margin: "0 10px", // Added horizontal space between images
+                    border: "1px solid #ccc", // Updated to a lighter and more subtle border
+                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", // Enhanced shadow for a more refined look
+                  }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
