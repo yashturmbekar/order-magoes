@@ -22,9 +22,9 @@ export default function AdminOrders() {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const token = localStorage.getItem("adminToken");
+        const token = localStorage.getItem("accessToken");
         const ordersData = await getAllOrders(token);
-        setOrders(ordersData);
+        setOrders(ordersData.data);
       } catch (err) {
         setError("Failed to fetch orders.");
       } finally {
@@ -37,7 +37,7 @@ export default function AdminOrders() {
 
   const handleUpdate = async (orderId, updatedFields) => {
     try {
-      const token = localStorage.getItem("adminToken");
+      const token = localStorage.getItem("accessToken");
       const updatedOrder = await updateOrder(orderId, updatedFields, token);
       if (updatedOrder && updatedOrder.lastUpdatedAt) {
         setOrders((prev) =>
@@ -64,7 +64,7 @@ export default function AdminOrders() {
     setConfirmation({
       show: true,
       onConfirm: async () => {
-        const token = localStorage.getItem("adminToken");
+        const token = localStorage.getItem("accessToken");
         try {
           await cancelOrder(orderId, token);
           setPopupMessage("Order cancelled successfully");
@@ -81,7 +81,7 @@ export default function AdminOrders() {
   };
 
   const handleActivate = async (orderId) => {
-    const token = localStorage.getItem("adminToken");
+    const token = localStorage.getItem("accessToken");
     try {
       await activateOrder(orderId, token);
       setPopupMessage("Order reactivated successfully");
@@ -100,7 +100,9 @@ export default function AdminOrders() {
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("adminToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+
     navigate("/admin/login");
   };
 

@@ -11,7 +11,9 @@ export default function AdminLogin() {
   const handleLogin = async () => {
     try {
       const response = await loginAdmin({ username, password });
-      localStorage.setItem("adminToken", response.access_token);
+      localStorage.setItem("accessToken", response.access_token);
+      // Set refreshToken into a secure HttpOnly cookie
+      document.cookie = `refreshToken=${response.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
       navigate("/admin/orders");
     } catch (err) {
       setError("Login failed. Please check your credentials.");

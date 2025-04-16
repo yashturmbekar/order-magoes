@@ -10,7 +10,7 @@ import AdminLogin from "./AdminLogin";
 import AdminOrders from "./AdminOrders";
 
 function PrivateRoute({ children }) {
-  const isAuthenticated = !!localStorage.getItem("adminToken");
+  const isAuthenticated = !!localStorage.getItem("accessToken");
   return isAuthenticated ? children : <Navigate to="/admin/login" replace />;
 }
 

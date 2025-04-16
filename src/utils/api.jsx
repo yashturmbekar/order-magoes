@@ -1,66 +1,108 @@
+import axios from "axios";
 import { config } from "./config";
 
 const API_BASE = config.API_BASE;
 
-export async function apiRequest(
-  path,
-  method = "GET",
-  body = null,
-  token = null
-) {
-  const headers = {
-    "Content-Type": "application/json",
-  };
+const api = axios.create({
+  baseURL: API_BASE,
+});
 
-  if (token) {
-    headers["Authorization"] = `Bearer ${token}`;
+let isRefreshing = false;
+let refreshSubscribers = [];
+
+const subscribeTokenRefresh = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
+const onRefreshed = (newAccessToken) => {
+  refreshSubscribers.forEach((callback) => callback(newAccessToken));
+  refreshSubscribers = [];
+};
+
+api.interceptors.request.use((config) => {
+  const accessToken = localStorage.getItem("accessToken");
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
   }
+  return config;
+});
 
-  const options = {
-    method,
-    headers,
-  };
+api.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          const refreshToken = localStorage.getItem("refreshToken");
+          const response = await axios.post(`${API_BASE}/auth/refresh`, {
+            refreshToken,
+          });
+          const newAccessToken = response.data.accessToken;
+          localStorage.setItem("accessToken", newAccessToken);
+          isRefreshing = false;
+          onRefreshed(newAccessToken);
+        } catch (err) {
+          isRefreshing = false;
+          localStorage.removeItem("accessToken");
+          localStorage.removeItem("refreshToken");
+          window.location.href = "/admin/login";
+          return Promise.reject(err);
+        }
+      }
 
-  if (body) {
-    options.body = JSON.stringify(body);
+      return new Promise((resolve) => {
+        subscribeTokenRefresh((newAccessToken) => {
+          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+          resolve(api(originalRequest));
+        });
+      });
+    }
+    return Promise.reject(error);
   }
+);
 
-  const response = await fetch(`${API_BASE}${path}`, options);
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || "API request failed");
-  }
-
-  return response.json();
-}
-
-export async function loginAdmin(credentials) {
-  return await apiRequest("/auth/login", "POST", credentials);
-}
+export const loginAdmin = async (credentials) => {
+  const response = await api.post("/auth/login", credentials);
+  localStorage.setItem("accessToken", response.data.accessToken);
+  // Set refreshToken into a secure HttpOnly cookie
+  document.cookie = `refreshToken=${response.data.refreshToken}; HttpOnly; Secure; SameSite=Strict; path=/`;
+  return response.data;
+};
 
 export async function getAllOrders(token) {
-  return await apiRequest("/admin/orders", "GET", null, token);
+  return await api.get("/admin/orders", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export async function getOrderByPhone(phoneNumber, token) {
-  return await apiRequest(`/orders/phone/${phoneNumber}`, "GET", null, token);
+  return await api.get(`/orders/phone/${phoneNumber}`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export async function updateOrder(orderId, orderData, token) {
-  return await apiRequest(`/admin/orders/${orderId}`, 'PATCH', orderData, token);
+  return await api.patch(`/admin/orders/${orderId}`, orderData, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export async function createOrder(data) {
-  return await apiRequest('/admin/orders', 'POST', data);
+  return await api.post("/admin/orders", data);
 }
 
 export async function cancelOrder(orderId, token) {
-  return await apiRequest(`/admin/orders/${orderId}/cancel`, 'PATCH', null, token);
+  return await api.patch(`/admin/orders/${orderId}/cancel`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export async function activateOrder(orderId, token) {
-  return await apiRequest(`/admin/orders/${orderId}/activate`, 'PATCH', null, token);
+  return await api.patch(`/admin/orders/${orderId}/activate`, null, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
-
+export default api;
