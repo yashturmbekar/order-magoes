@@ -1,6 +1,39 @@
 import React, { useEffect, useState } from "react";
-import { createOrder, getOrderByPhone } from "./utils/api";
+import { createOrder, getOrderByPhone, fetchAllStatistics } from "./utils/api";
 import Popup from "./utils/Popup";
+import Odometer from "react-odometerjs";
+import "odometer/themes/odometer-theme-default.css";
+
+function Statistics({ statistics }) {
+  const [mangoesDelivered, setMangoesDelivered] = useState(0);
+  const [ordersReceived, setOrdersReceived] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMangoesDelivered(statistics.totalMangoesDelivered);
+      setOrdersReceived(statistics.totalOrdersReceived);
+    }, 1500); // Increased delay for slower animation effect
+
+    return () => clearTimeout(timer);
+  }, [statistics]);
+
+  return (
+    <div
+      className="statistics-container"
+    >
+      <div
+        className="stat-info"
+        style={{ textAlign: "center", fontSize: "1.2rem", color: "#4e342e" }}
+      >
+        <Odometer value={mangoesDelivered} format="(,ddd)" theme="default" />
+        <span> dozen of mangoes shared with </span>
+
+        <Odometer value={ordersReceived} format="(,ddd)" theme="default" />
+        <span> + mango lovers.</span>
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   const [form, setForm] = useState({
@@ -16,7 +49,7 @@ export default function LandingPage() {
   const [popupMessage, setPopupMessage] = useState("");
   const [activeSection, setActiveSection] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [isTransitioning, setIsTransitioning] = useState(true);
+  const [isTransitioning] = useState(true);
   const photos = [
     "/real-mango-1.jpg",
     "/real-mango-2.jpg",
@@ -29,6 +62,24 @@ export default function LandingPage() {
     ...photos,
     photos[0], // Add the first photo at the end for smooth looping
   ];
+
+  const [statistics, setStatistics] = useState({
+    totalMangoesDelivered: 0,
+    totalOrdersReceived: 0,
+  });
+
+  useEffect(() => {
+    async function fetchStatistics() {
+      try {
+        const statisticsData = await fetchAllStatistics();
+        setStatistics(statisticsData.data);
+      } catch (error) {
+        console.error("Failed to fetch statistics", error);
+      }
+    }
+
+    fetchStatistics();
+  }, []);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowAnimation(false), 3000);
@@ -455,6 +506,8 @@ export default function LandingPage() {
           <p>🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked...</p>
           <p>🚚 Delivered farm-fresh across Pune and nearby areas...</p>
           <p>🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed</p>
+
+          <Statistics statistics={statistics} />
 
           <div
             className="photo-carousel"

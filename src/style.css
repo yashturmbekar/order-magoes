@@ -435,6 +435,94 @@ button:hover {
   background-color: #d32f2f;
 }
 
+.statistics-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+  margin: 20px 0;
+  padding: 2rem;
+}
+
+.stat-info {
+  text-align: center;
+  font-size: 1.5rem;
+  color: #4e342e;
+  font-weight: bold;
+}
+
+.stat-info .odometer {
+  font-size: 2.5rem;
+  color: #e65100;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statistics-container {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .stat-info .odometer {
+    font-size: 1.5rem;
+  }
+}
+
+/* Counter Animation Styles */
+.counter {
+  text-align: center;
+  font-family: "Arial", sans-serif;
+  margin: 1rem;
+}
+
+.counter h3 {
+  font-size: 2.5rem;
+  color: #ff6f61;
+  margin: 0;
+}
+
+.counter p {
+  font-size: 1.2rem;
+  color: #333;
+  margin: 0.5rem 0 0;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statistics-container {
+    grid-template-columns: 1fr;
+    padding: 1.5rem;
+  }
+
+  .stat-card {
+    padding: 1rem;
+  }
+
+  .stat-info h3 {
+    font-size: 1.2rem;
+  }
+
+  .stat-info .odometer {
+    font-size: 1.5rem;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .statistics-container {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .orders-table {
@@ -623,3 +711,4 @@ button:hover {
     font-size: 0.9rem;
   }
 }
+

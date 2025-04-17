@@ -104,4 +104,8 @@ export async function activateOrder(orderId, token) {
   });
 }
 
+export async function fetchAllStatistics() {
+    return await api.get(`/admin/orders/statistics`);
+}
+
 export default api;
