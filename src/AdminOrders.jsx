@@ -226,9 +226,9 @@ export default function AdminOrders() {
                         <td>{order.quantity}</td>
                         <td>{order.location}</td>
                         <td>{`${new Date(
-                          order.created_at
+                          order.createdAt
                         ).toLocaleDateString()} ${new Date(
-                          order.created_at
+                          order.createdAt
                         ).toLocaleTimeString([], {
                           hour: "2-digit",
                           minute: "2-digit",
