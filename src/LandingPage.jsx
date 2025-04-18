@@ -18,9 +18,7 @@ function Statistics({ statistics }) {
   }, [statistics]);
 
   return (
-    <div
-      className="statistics-container"
-    >
+    <div className="statistics-container">
       <div
         className="stat-info"
         style={{ textAlign: "center", fontSize: "1.2rem", color: "#4e342e" }}
@@ -250,8 +248,13 @@ export default function LandingPage() {
                       <tr
                         key={order.id}
                         className={`${rowClass} ${
-                          order.isActive === false ? "inactive" : ""
+                          order.isActive === false ? "inactive-row" : ""
                         }`}
+                        style={{
+                          backgroundColor:
+                            order.isActive === false ? "#D3D3D3" : "", // Light gray
+                          color: order.isActive === false ? "red" : "",
+                        }}
                       >
                         <td>{index + 1}</td>
                         <td>{order.orderId}</td>
