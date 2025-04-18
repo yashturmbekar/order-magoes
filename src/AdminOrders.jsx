@@ -214,9 +214,17 @@ export default function AdminOrders() {
   };
 
   const handleChange = (index, field, value) => {
-    const updated = [...orders];
-    updated[index][field] = value;
-    setOrders(updated);
+    const updatedOrders = [
+      ...(filteredOrders.length > 0 ? filteredOrders : orders),
+    ];
+    const globalIndex = index + (currentPage - 1) * ordersPerPage;
+    updatedOrders[globalIndex][field] = value;
+
+    if (filteredOrders.length > 0) {
+      setFilteredOrders(updatedOrders);
+    } else {
+      setOrders(updatedOrders);
+    }
   };
 
   const handleLogout = () => {
@@ -242,17 +250,29 @@ export default function AdminOrders() {
     try {
       const token = localStorage.getItem("accessToken");
       const groupedOrdersData = await getGroupedDeliveryOrders(token);
-      console.log("Grouped Orders Data:", groupedOrdersData.data[type]);
-      console.log("Selected Type:", type);
-      setFilteredOrders(groupedOrdersData.data[type] || []);
+      const selectedOrders = groupedOrdersData.data[type] || [];
+
+      setFilteredOrders(selectedOrders); // Set filtered orders directly
+
+      setStatistics((prev) => ({
+        ...prev,
+        selectedStatistic: type
+          .replace(/([A-Z])/g, " $1")
+          .replace(/^./, (str) => str.toUpperCase()), // Format the statistic type for display
+      }));
+
+      if (selectedOrders.length === 0) {
+        setPopupMessage(
+          `0 orders found for ${type.replace(/([A-Z])/g, " $1").toLowerCase()}.`
+        ); // Show a message if no orders exist
+      }
     } catch (err) {
       console.error("Failed to fetch filtered orders", err);
+      setPopupMessage("An error occurred while fetching orders.");
     }
   };
 
-  useEffect(() => {
-    setCurrentPage(1); // Reset to the first page whenever filteredOrders changes
-  }, [filteredOrders]);
+  useEffect(() => {}, [filteredOrders]);
 
   const sortedAndFilteredOrders = orders
     .filter((order) =>
@@ -329,7 +349,9 @@ export default function AdminOrders() {
 
         <div className="form-card">
           <h2>
-            {filteredOrders.length > 0 ? "Filtered Orders" : "All Orders"}
+            {filteredOrders.length > 0
+              ? `${statistics?.selectedStatistic?.replace(/([A-Z])/g, " $1")}`
+              : "All Orders"}
           </h2>
 
           <input
