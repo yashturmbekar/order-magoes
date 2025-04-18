@@ -5,8 +5,57 @@ import {
   updateOrder,
   cancelOrder,
   activateOrder,
+  getDeliveryStatistics,
 } from "./utils/api";
 import Popup from "./utils/Popup";
+import Odometer from "react-odometerjs";
+
+function Statistics({ statistics }) {
+  const [dozensDelivered, setDozensDelivered] = useState(0);
+  const [paymentsCompleted, setPaymentsCompleted] = useState(0);
+  const [pendingPayments, setPendingPayments] = useState(0);
+  const [deliveryPending, setDeliveryPending] = useState(0);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDozensDelivered(statistics.totalDozensDelivered);
+      setPaymentsCompleted(statistics.totalPaymentsCompleted);
+      setPendingPayments(statistics.totalDeliveredWithPendingPayment);
+      setDeliveryPending(
+        parseInt(statistics.totalDozensOutForDelivery || 0) +
+          parseInt(statistics.totalDozensInProgress || 0) +
+          parseInt(statistics.totalDozensOrderReceived || 0)
+      );
+    }, 1500); // Increased delay for slower animation effect
+
+    return () => clearTimeout(timer);
+  }, [statistics]);
+
+  return (
+    <div className="statistics-container-admin">
+      <h2>Delivery Statistics</h2>
+      <div className="statistics-row-admin">
+        <div className="stat-item-admin">
+          <p>Total Dozens Delivered</p>
+          <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Pending Deliveries</p>
+          <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Payments Completed</p>
+          <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Awaiting Payment</p>
+          <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
+        </div>
+        
+      </div>
+    </div>
+  );
+}
 
 export default function AdminOrders() {
   const [orders, setOrders] = useState([]);
@@ -17,6 +66,7 @@ export default function AdminOrders() {
     show: false,
     onConfirm: null,
   });
+  const [statistics, setStatistics] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -33,6 +83,20 @@ export default function AdminOrders() {
     };
 
     fetchOrders();
+  }, []);
+
+  useEffect(() => {
+    const fetchStatistics = async () => {
+      try {
+        const token = localStorage.getItem("accessToken");
+        const statsData = await getDeliveryStatistics(token);
+        setStatistics(statsData.data);
+      } catch (err) {
+        console.error("Failed to fetch statistics", err);
+      }
+    };
+
+    fetchStatistics();
   }, []);
 
   const handleUpdate = async (orderId, updatedFields) => {
@@ -164,6 +228,11 @@ export default function AdminOrders() {
           <p className="subtitle">Manage Orders</p>
         </div>
 
+        {/* Moved the statistics section below the hero subtitle */}
+        <div className="statistics-wrapper">
+          {statistics && <Statistics statistics={statistics} />}
+        </div>
+
         <div className="form-card">
           <h2>All Orders</h2>
 
@@ -220,7 +289,7 @@ export default function AdminOrders() {
                         }`}
                         style={{
                           backgroundColor:
-                          order.isActive === false ? "#D3D3D3" : "", // Light gray
+                            order.isActive === false ? "#D3D3D3" : "", // Light gray
                           color: order.isActive === false ? "red" : "",
                         }}
                       >

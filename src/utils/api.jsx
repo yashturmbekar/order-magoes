@@ -105,7 +105,13 @@ export async function activateOrder(orderId, token) {
 }
 
 export async function fetchAllStatistics() {
-    return await api.get(`/admin/orders/statistics`);
+  return await api.get(`/admin/orders/statistics`);
+}
+
+export async function getDeliveryStatistics(token) {
+  return await api.get(`/admin/orders/delivery-statistics`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
 }
 
 export default api;
