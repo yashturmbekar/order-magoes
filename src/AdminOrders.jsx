@@ -92,6 +92,8 @@ export default function AdminOrders() {
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [currentPage, setCurrentPage] = useState(1);
+  const ordersPerPage = 10;
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -240,12 +242,17 @@ export default function AdminOrders() {
     try {
       const token = localStorage.getItem("accessToken");
       const groupedOrdersData = await getGroupedDeliveryOrders(token);
-      console.log(type);
+      console.log("Grouped Orders Data:", groupedOrdersData.data[type]);
+      console.log("Selected Type:", type);
       setFilteredOrders(groupedOrdersData.data[type] || []);
     } catch (err) {
       console.error("Failed to fetch filtered orders", err);
     }
   };
+
+  useEffect(() => {
+    setCurrentPage(1); // Reset to the first page whenever filteredOrders changes
+  }, [filteredOrders]);
 
   const sortedAndFilteredOrders = orders
     .filter((order) =>
@@ -261,6 +268,23 @@ export default function AdminOrders() {
       if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
+
+  const indexOfLastOrder = currentPage * ordersPerPage;
+  const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
+  const currentOrders =
+    filteredOrders.length > 0
+      ? filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder)
+      : sortedAndFilteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+
+  const totalPages = Math.ceil(
+    (filteredOrders.length > 0
+      ? filteredOrders.length
+      : sortedAndFilteredOrders.length) / ordersPerPage
+  );
+
+  const handlePageChange = (pageNumber) => {
+    setCurrentPage(pageNumber);
+  };
 
   return (
     <div className="page">
@@ -402,8 +426,8 @@ export default function AdminOrders() {
                 </thead>
                 <tbody>
                   {(filteredOrders.length > 0
-                    ? filteredOrders
-                    : sortedAndFilteredOrders
+                    ? currentOrders
+                    : currentOrders
                   ).map((order, index) => {
                     const getRowClass = () => {
                       if (
@@ -543,6 +567,35 @@ export default function AdminOrders() {
                   })}
                 </tbody>
               </table>
+              <div className="pagination">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="pagination-btn"
+                >
+                  Previous
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+                  (pageNumber) => (
+                    <button
+                      key={pageNumber}
+                      onClick={() => handlePageChange(pageNumber)}
+                      className={`pagination-btn ${
+                        pageNumber === currentPage ? "active" : ""
+                      }`}
+                    >
+                      {pageNumber}
+                    </button>
+                  )
+                )}
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="pagination-btn"
+                >
+                  Next
+                </button>
+              </div>
             </div>
           )}
         </div>
