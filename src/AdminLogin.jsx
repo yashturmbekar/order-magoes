@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "./utils/api";
+import Header from "./sections/Header";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -21,63 +22,56 @@ export default function AdminLogin() {
   };
 
   return (
-    <div className="page">
-      <div className="overlay">
-        <div className="hero">
-          <p className="tagline">यह बात सिर्फ आम ही नहीं, काम की भी है!</p>
-          <h1
-            onClick={() => (window.location.href = "/")}
-            style={{ cursor: "pointer" }}
-          >
-            Mangoes <span className="highlight">At</span>
-            <br />
-            <span className="highlight">Your Doorstep</span>
-          </h1>
-          <p className="subtitle">Admin Panel</p>
+    <div>
+      <div className="page">
+        <div className="overlay">
+          <Header />
+
+          <div className="form-card">
+            <h2>Admin Login</h2>
+            {error && <div className="error">{error}</div>}
+
+            <input
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+
+            <button onClick={handleLogin}>Login</button>
+            <div style={{ marginTop: "2rem" }}></div>
+          </div>
         </div>
 
-        <div className="form-card">
-          <h2>Admin Login</h2>
-          {error && <div className="error">{error}</div>}
-
-          <input
-            type="text"
-            placeholder="Username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-
-          <button onClick={handleLogin}>Login</button>
-          <div style={{ marginTop: "2rem" }}></div>
-        </div>
+        <footer className="footer">
+          <h4>Contact Support</h4>
+          <div className="footer-details">
+            <p>
+              <strong>Yash Turmbekar</strong>
+            </p>
+            <p>
+              📞 <a href="tel:+918237381312">+91 82373 81312</a>
+            </p>
+            <p>
+              📧{" "}
+              <a href="mailto:yashturmbkar7@gmail.com">
+                yashturmbkar7@gmail.com
+              </a>
+            </p>
+            <p>📍 Pune, Maharashtra</p>
+          </div>
+          <p className="footer-note">
+            © 2025 Mangoes At Your Doorstep | Admin Panel
+          </p>
+        </footer>
       </div>
-
-      <footer className="footer">
-        <h4>Contact Support</h4>
-        <div className="footer-details">
-          <p>
-            <strong>Yash Turmbekar</strong>
-          </p>
-          <p>
-            📞 <a href="tel:+918237381312">+91 82373 81312</a>
-          </p>
-          <p>
-            📧{" "}
-            <a href="mailto:yashturmbkar7@gmail.com">yashturmbkar7@gmail.com</a>
-          </p>
-          <p>📍 Pune, Maharashtra</p>
-        </div>
-        <p className="footer-note">
-          © 2025 Mangoes At Your Doorstep | Admin Panel
-        </p>
-      </footer>
     </div>
   );
 }

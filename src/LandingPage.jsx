@@ -3,7 +3,9 @@ import { createOrder, getOrderByPhone, fetchAllStatistics } from "./utils/api";
 import Popup from "./utils/Popup";
 import Odometer from "react-odometerjs";
 import "odometer/themes/odometer-theme-default.css";
+import Header from "./sections/Header";
 
+// Statistics Component
 function Statistics({ statistics }) {
   const [mangoesDelivered, setMangoesDelivered] = useState(0);
   const [ordersReceived, setOrdersReceived] = useState(0);
@@ -33,7 +35,9 @@ function Statistics({ statistics }) {
   );
 }
 
+// LandingPage Component
 export default function LandingPage() {
+  // State Management
   const [form, setForm] = useState({
     name: "",
     phone: "",
@@ -48,6 +52,14 @@ export default function LandingPage() {
   const [activeSection, setActiveSection] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isTransitioning] = useState(true);
+  const [statistics, setStatistics] = useState({
+    totalMangoesDelivered: 0,
+    totalOrdersReceived: 0,
+  });
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+
+  // Constants
   const photos = [
     "/real-mango-1.jpg",
     "/real-mango-2.jpg",
@@ -61,11 +73,7 @@ export default function LandingPage() {
     photos[0], // Add the first photo at the end for smooth looping
   ];
 
-  const [statistics, setStatistics] = useState({
-    totalMangoesDelivered: 0,
-    totalOrdersReceived: 0,
-  });
-
+  // Effects
   useEffect(() => {
     async function fetchStatistics() {
       try {
@@ -92,6 +100,7 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, [photos.length]);
 
+  // Validation
   const validate = () => {
     const newErrors = {};
     if (!form.name.trim()) newErrors.name = "Name is required";
@@ -106,6 +115,7 @@ export default function LandingPage() {
     return Object.keys(newErrors).length === 0;
   };
 
+  // Handlers
   const handleSubmit = async () => {
     if (!validate()) return;
 
@@ -133,7 +143,8 @@ export default function LandingPage() {
     const newErrors = {};
     if (!/^\d{10}$/.test(phoneForDetails)) {
       setUserOrders([]); // Clear old orders from the UI
-      newErrors.phoneForGetOrderDetails = "Please enter a valid 10-digit number used to place your order.";
+      newErrors.phoneForGetOrderDetails =
+        "Please enter a valid 10-digit number used to place your order.";
       setErrors(newErrors);
       return;
     } else {
@@ -154,9 +165,6 @@ export default function LandingPage() {
     }
   };
 
-  const [searchTerm, setSearchTerm] = useState("");
-  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
-
   const handleSearch = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };
@@ -169,21 +177,28 @@ export default function LandingPage() {
     setSortConfig({ key, direction });
   };
 
+  // Define sortedAndFilteredOrders based on userOrders, searchTerm, and sortConfig
   const sortedAndFilteredOrders = userOrders
-    .filter((order) =>
-      Object.values(order).some((value) =>
-        String(value).toLowerCase().includes(searchTerm)
-      )
-    )
+    .filter((order) => {
+      // Filter orders based on the search term
+      return (
+        order.name.toLowerCase().includes(searchTerm) ||
+        order.phone.includes(searchTerm) ||
+        order.location.toLowerCase().includes(searchTerm)
+      );
+    })
     .sort((a, b) => {
+      // Sort orders based on the sortConfig
       if (!sortConfig.key) return 0;
       const aValue = a[sortConfig.key];
       const bValue = b[sortConfig.key];
+
       if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
       if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
       return 0;
     });
 
+  // Render Section
   const renderSection = () => {
     if (activeSection === "order") {
       return (
@@ -240,7 +255,9 @@ export default function LandingPage() {
               }
             }}
           />
-          {errors.phoneForGetOrderDetails && <div className="error">{errors.phoneForGetOrderDetails}</div>}
+          {errors.phoneForGetOrderDetails && (
+            <div className="error">{errors.phoneForGetOrderDetails}</div>
+          )}
           <button onClick={handleGetOrders}>Get Order Details</button>
 
           {userOrders && userOrders.length > 0 && (
@@ -437,6 +454,7 @@ export default function LandingPage() {
     return null;
   };
 
+  // Main Render
   return (
     <div className="page">
       {showAnimation && (
@@ -466,18 +484,7 @@ export default function LandingPage() {
       )}
 
       <div className="overlay">
-        <div className="hero">
-          <p className="tagline">यह बात सिर्फ आम ही नहीं, काम की भी है!</p>
-          <h1
-            onClick={() => (window.location.href = "/")}
-            style={{ cursor: "pointer" }}
-          >
-            Mangoes <span className="highlight">At</span>
-            <br />
-            <span className="highlight">Your Doorstep</span>
-          </h1>
-          <p className="subtitle">Anywhere in Pune</p>
-        </div>
+        <Header />
 
         <div
           className="button-group"

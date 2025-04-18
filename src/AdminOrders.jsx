@@ -9,6 +9,7 @@ import {
 } from "./utils/api";
 import Popup from "./utils/Popup";
 import Odometer from "react-odometerjs";
+import Header from "./sections/Header";
 
 function Statistics({ statistics }) {
   const [dozensDelivered, setDozensDelivered] = useState(0);
@@ -100,6 +101,16 @@ export default function AdminOrders() {
     fetchStatistics();
   }, []);
 
+  const updateStatistics = async () => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const statsData = await getDeliveryStatistics(token);
+      setStatistics(statsData.data);
+    } catch (err) {
+      console.error("Failed to update statistics", err);
+    }
+  };
+
   const handleUpdate = async (orderId, updatedFields) => {
     try {
       const token = localStorage.getItem("accessToken");
@@ -117,6 +128,7 @@ export default function AdminOrders() {
           )
         );
         setPopupMessage("Order updated successfully");
+        await updateStatistics();
       } else {
         setPopupMessage("Failed to retrieve updated date from the server.");
       }
@@ -144,6 +156,7 @@ export default function AdminOrders() {
                 : order
             )
           );
+          await updateStatistics();
         } catch (err) {
           setPopupMessage("Failed to cancel order");
         } finally {
@@ -169,6 +182,7 @@ export default function AdminOrders() {
             : order
         )
       );
+      await updateStatistics();
     } catch (err) {
       setPopupMessage("Failed to activate order");
     }
@@ -243,18 +257,7 @@ export default function AdminOrders() {
       </div>
 
       <div className="overlay">
-        <div className="hero">
-          <p className="tagline">Admin Dashboard</p>
-          <h1
-            onClick={() => (window.location.href = "/")}
-            style={{ cursor: "pointer" }}
-          >
-            Mangoes <span className="highlight">At</span>
-            <br />
-            <span className="highlight">Your Doorstep</span>
-          </h1>
-          <p className="subtitle">Manage Orders</p>
-        </div>
+        <Header />
 
         {/* Moved the statistics section below the hero subtitle */}
         <div className="statistics-wrapper">
