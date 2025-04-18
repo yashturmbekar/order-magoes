@@ -129,14 +129,25 @@ export default function LandingPage() {
 
     try {
       await createOrder(order);
-      const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
-      const url = `https://wa.me/918830997757?text=${encodeURIComponent(
-        message
-      )}`;
-      window.open(url, "_blank");
+      setPopupMessage(
+        "✅ Order placed successfully! Click 'Proceed' to send details on WhatsApp, or 'Cancel' to close this message."
+      );
     } catch (err) {
       alert("Something went wrong: " + err.message);
     }
+  };
+
+  const handleProceed = () => {
+    const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
+    const url = `https://wa.me/918830997757?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(url, "_blank");
+    setPopupMessage(""); // Close the popup after proceeding
+  };
+
+  const handleCancel = () => {
+    setPopupMessage(""); // Close the popup
   };
 
   const handleGetOrders = async () => {
@@ -677,7 +688,38 @@ export default function LandingPage() {
       </div>
 
       {popupMessage && (
-        <Popup message={popupMessage} onClose={() => setPopupMessage("")} />
+        <Popup message={popupMessage} hideCloseButton={true}>
+          <div
+            style={{ display: "flex", justifyContent: "center", gap: "10px" }}
+          >
+            <button
+              onClick={handleProceed}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Proceed
+            </button>
+            <button
+              onClick={handleCancel}
+              style={{
+                padding: "10px 20px",
+                backgroundColor: "#f44336",
+                color: "white",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+        </Popup>
       )}
 
       <footer className="footer">
