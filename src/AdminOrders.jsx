@@ -32,28 +32,27 @@ function Statistics({ statistics }) {
   }, [statistics]);
 
   return (
-    <div className="statistics-container-admin">
-      <h2>Delivery Statistics</h2>
-      <div className="statistics-row-admin">
-        <div className="stat-item-admin">
-          <p>Total Dozens Delivered</p>
-          <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
-        </div>
-        <div className="stat-item-admin">
-          <p>Pending Deliveries</p>
-          <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
-        </div>
-        <div className="stat-item-admin">
-          <p>Payments Completed</p>
-          <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
-        </div>
-        <div className="stat-item-admin">
-          <p>Awaiting Payment</p>
-          <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
-        </div>
-        
+  <div className="statistics-container-admin">
+    <h2>Delivery Statistics</h2>
+    <div className="statistics-row-admin">
+      <div className="stat-item-admin">
+        <p>Total Dozens Delivered</p>
+        <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
+      </div>
+      <div className="stat-item-admin">
+        <p>Pending Deliveries (Dozens)</p>
+        <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
+      </div>
+      <div className="stat-item-admin">
+        <p>Total Orders with Completed Payments</p>
+        <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
+      </div>
+      <div className="stat-item-admin">
+        <p>Orders Delivered but Awaiting Payment</p>
+        <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
       </div>
     </div>
+  </div>
   );
 }
 
