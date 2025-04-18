@@ -32,27 +32,27 @@ function Statistics({ statistics }) {
   }, [statistics]);
 
   return (
-  <div className="statistics-container-admin">
-    <h2>Delivery Statistics</h2>
-    <div className="statistics-row-admin">
-      <div className="stat-item-admin">
-        <p>Total Dozens Delivered</p>
-        <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
-      </div>
-      <div className="stat-item-admin">
-        <p>Pending Deliveries (Dozens)</p>
-        <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
-      </div>
-      <div className="stat-item-admin">
-        <p>Total Orders with Completed Payments</p>
-        <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
-      </div>
-      <div className="stat-item-admin">
-        <p>Orders Delivered but Awaiting Payment</p>
-        <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
+    <div className="statistics-container-admin">
+      <h2>Delivery Statistics</h2>
+      <div className="statistics-row-admin">
+        <div className="stat-item-admin">
+          <p>Total Dozens Delivered</p>
+          <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Pending Deliveries (Dozens)</p>
+          <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Total Orders with Completed Payments</p>
+          <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
+        </div>
+        <div className="stat-item-admin">
+          <p>Orders Delivered but Awaiting Payment</p>
+          <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
+        </div>
       </div>
     </div>
-  </div>
   );
 }
 
@@ -66,6 +66,8 @@ export default function AdminOrders() {
     onConfirm: null,
   });
   const [statistics, setStatistics] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -185,6 +187,33 @@ export default function AdminOrders() {
     navigate("/admin/login");
   };
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+
+  const handleSort = (key) => {
+    let direction = "asc";
+    if (sortConfig.key === key && sortConfig.direction === "asc") {
+      direction = "desc";
+    }
+    setSortConfig({ key, direction });
+  };
+
+  const sortedAndFilteredOrders = orders
+    .filter((order) =>
+      Object.values(order).some((value) =>
+        String(value).toLowerCase().includes(searchTerm)
+      )
+    )
+    .sort((a, b) => {
+      if (!sortConfig.key) return 0;
+      const aValue = a[sortConfig.key];
+      const bValue = b[sortConfig.key];
+      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
+      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    });
+
   return (
     <div className="page">
       {popupMessage && (
@@ -235,6 +264,14 @@ export default function AdminOrders() {
         <div className="form-card">
           <h2>All Orders</h2>
 
+          <input
+            type="text"
+            placeholder="Search orders..."
+            value={searchTerm}
+            onChange={handleSearch}
+            className="search-input"
+          />
+
           {loading && <p>Loading orders...</p>}
           {error && <div className="error">{error}</div>}
 
@@ -244,20 +281,83 @@ export default function AdminOrders() {
                 <thead>
                   <tr>
                     <th>#</th>
-                    <th>Order Id</th>
-                    <th>Name</th>
-                    <th>Phone</th>
-                    <th>Qty</th>
-                    <th>Delivery Location</th>
-                    <th>Order Date</th>
-                    <th>Last Updated</th>
-                    <th>Order Status</th>
-                    <th>Payment Status</th>
+                    <th onClick={() => handleSort("orderId")}>
+                      Order Id{" "}
+                      {sortConfig.key === "orderId"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("name")}>
+                      Name{" "}
+                      {sortConfig.key === "name"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("phone")}>
+                      Phone{" "}
+                      {sortConfig.key === "phone"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("quantity")}>
+                      Qty{" "}
+                      {sortConfig.key === "quantity"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("location")}>
+                      Delivery Location{" "}
+                      {sortConfig.key === "location"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("createdAt")}>
+                      Order Date{" "}
+                      {sortConfig.key === "createdAt"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("lastUpdatedAt")}>
+                      Last Updated{" "}
+                      {sortConfig.key === "lastUpdatedAt"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("orderStatus")}>
+                      Order Status{" "}
+                      {sortConfig.key === "orderStatus"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
+                    <th onClick={() => handleSort("paymentStatus")}>
+                      Payment Status{" "}
+                      {sortConfig.key === "paymentStatus"
+                        ? sortConfig.direction === "asc"
+                          ? "▲"
+                          : "▼"
+                        : "▲▼"}
+                    </th>
                     <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {orders.map((order, index) => {
+                  {sortedAndFilteredOrders.map((order, index) => {
                     const getRowClass = () => {
                       if (
                         order.orderStatus === "delivered" &&
