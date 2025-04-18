@@ -272,7 +272,10 @@ export default function AdminOrders() {
     }
   };
 
-  useEffect(() => {}, [filteredOrders]);
+  useEffect(() => {
+    setCurrentPage(1); 
+    setSortConfig({ key: null, direction: "asc" });
+  }, [filteredOrders]);
 
   const sortedAndFilteredOrders = orders
     .filter((order) =>
