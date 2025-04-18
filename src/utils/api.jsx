@@ -114,4 +114,10 @@ export async function getDeliveryStatistics(token) {
   });
 }
 
+export async function getGroupedDeliveryOrders(token) {
+  return await api.get(`/admin/orders/grouped-delivery-orders`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+}
+
 export default api;

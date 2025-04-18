@@ -6,12 +6,13 @@ import {
   cancelOrder,
   activateOrder,
   getDeliveryStatistics,
+  getGroupedDeliveryOrders,
 } from "./utils/api";
 import Popup from "./utils/Popup";
 import Odometer from "react-odometerjs";
 import Header from "./sections/Header";
 
-function Statistics({ statistics }) {
+function Statistics({ statistics, onStatisticClick }) {
   const [dozensDelivered, setDozensDelivered] = useState(0);
   const [paymentsCompleted, setPaymentsCompleted] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
@@ -38,23 +39,38 @@ function Statistics({ statistics }) {
     <div className="statistics-container-admin">
       <h2>Delivery Statistics</h2>
       <div className="statistics-row-admin">
-        <div className="stat-item-admin">
+        <div
+          className="stat-item-admin"
+          onClick={() => onStatisticClick("allOrders")}
+        >
           <p>Total Orders</p>
           <Odometer value={totalOrders} format="(,ddd)" theme="default" />
         </div>
-        <div className="stat-item-admin">
+        <div
+          className="stat-item-admin"
+          onClick={() => onStatisticClick("deliveredOrders")}
+        >
           <p>Total Dozens Delivered</p>
           <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />
         </div>
-        <div className="stat-item-admin">
+        <div
+          className="stat-item-admin"
+          onClick={() => onStatisticClick("pendingDeliveryOrders")}
+        >
           <p>Pending Deliveries (Dozens)</p>
           <Odometer value={deliveryPending} format="(,ddd)" theme="default" />
         </div>
-        <div className="stat-item-admin">
+        <div
+          className="stat-item-admin"
+          onClick={() => onStatisticClick("paymentsCompletedOrders")}
+        >
           <p>Total Orders with Completed Payments</p>
           <Odometer value={paymentsCompleted} format="(,ddd)" theme="default" />
         </div>
-        <div className="stat-item-admin">
+        <div
+          className="stat-item-admin"
+          onClick={() => onStatisticClick("deliveredWithPendingPaymentOrders")}
+        >
           <p>Orders Delivered but Awaiting Payment</p>
           <Odometer value={pendingPayments} format="(,ddd)" theme="default" />
         </div>
@@ -73,6 +89,7 @@ export default function AdminOrders() {
     onConfirm: null,
   });
   const [statistics, setStatistics] = useState(null);
+  const [filteredOrders, setFilteredOrders] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const navigate = useNavigate();
@@ -219,6 +236,17 @@ export default function AdminOrders() {
     setSortConfig({ key, direction });
   };
 
+  const handleStatisticClick = async (type) => {
+    try {
+      const token = localStorage.getItem("accessToken");
+      const groupedOrdersData = await getGroupedDeliveryOrders(token);
+      console.log(type);
+      setFilteredOrders(groupedOrdersData.data[type] || []);
+    } catch (err) {
+      console.error("Failed to fetch filtered orders", err);
+    }
+  };
+
   const sortedAndFilteredOrders = orders
     .filter((order) =>
       Object.values(order).some((value) =>
@@ -267,11 +295,18 @@ export default function AdminOrders() {
 
         {/* Moved the statistics section below the hero subtitle */}
         <div className="statistics-wrapper">
-          {statistics && <Statistics statistics={statistics} />}
+          {statistics && (
+            <Statistics
+              statistics={statistics}
+              onStatisticClick={handleStatisticClick}
+            />
+          )}
         </div>
 
         <div className="form-card">
-          <h2>All Orders</h2>
+          <h2>
+            {filteredOrders.length > 0 ? "Filtered Orders" : "All Orders"}
+          </h2>
 
           <input
             type="text"
@@ -366,7 +401,10 @@ export default function AdminOrders() {
                   </tr>
                 </thead>
                 <tbody>
-                  {sortedAndFilteredOrders.map((order, index) => {
+                  {(filteredOrders.length > 0
+                    ? filteredOrders
+                    : sortedAndFilteredOrders
+                  ).map((order, index) => {
                     const getRowClass = () => {
                       if (
                         order.orderStatus === "delivered" &&
