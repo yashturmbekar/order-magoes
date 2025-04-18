@@ -16,6 +16,7 @@ function Statistics({ statistics }) {
   const [paymentsCompleted, setPaymentsCompleted] = useState(0);
   const [pendingPayments, setPendingPayments] = useState(0);
   const [deliveryPending, setDeliveryPending] = useState(0);
+  const [totalOrders, setTotalOrders] = useState(0);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -27,6 +28,7 @@ function Statistics({ statistics }) {
           parseInt(statistics.totalDozensInProgress || 0) +
           parseInt(statistics.totalDozensOrderReceived || 0)
       );
+      setTotalOrders(statistics.totalOrders);
     }, 1500); // Increased delay for slower animation effect
 
     return () => clearTimeout(timer);
@@ -36,6 +38,10 @@ function Statistics({ statistics }) {
     <div className="statistics-container-admin">
       <h2>Delivery Statistics</h2>
       <div className="statistics-row-admin">
+        <div className="stat-item-admin">
+          <p>Total Orders</p>
+          <Odometer value={totalOrders} format="(,ddd)" theme="default" />
+        </div>
         <div className="stat-item-admin">
           <p>Total Dozens Delivered</p>
           <Odometer value={dozensDelivered} format="(,ddd)" theme="default" />

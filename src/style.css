@@ -577,6 +577,108 @@ button:hover {
   }
 }
 
+/* Add responsive styles for the statistics container */
+@media (max-width: 768px) {
+  .statistics-container-admin {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .statistics-row-admin {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+
+  .stat-item-admin {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+  }
+
+  .stat-item-admin p {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+}
+
+/* Update responsive styles for the statistics container to make it horizontally scrollable */
+@media (max-width: 768px) {
+  .statistics-row-admin {
+    display: flex;
+    flex-direction: row;
+    gap: 15px;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+
+  .stat-item-admin {
+    flex: 0 0 auto;
+    text-align: center;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    min-width: 150px;
+  }
+
+  .stat-item-admin p {
+    margin-bottom: 5px;
+    font-size: 16px;
+  }
+}
+
+/* Increase the height of the statistics container for better visibility on mobile */
+@media (max-width: 768px) {
+  .statistics-container-admin {
+    height: auto; /* Allow the height to adjust dynamically */
+    min-height: 200px; /* Set a minimum height for better visibility */
+  }
+
+  .stat-item-admin {
+    padding: 15px; /* Increase padding for better spacing */
+  }
+}
+
+/* Ensure the logout button is always visible in mobile view */
+@media (max-width: 768px) {
+  .logout-container {
+    position: fixed; /* Make it fixed to ensure visibility */
+    top: 10px;
+    right: 10px;
+    z-index: 1000; /* Ensure it appears above other elements */
+  }
+
+  .logout-btn {
+    padding: 12px 18px; /* Adjust padding for better visibility */
+    font-size: 16px; /* Slightly larger font for mobile */
+  }
+}
+
+/* Ensure consistent colors across devices */
+@media (max-width: 768px) {
+  .statistics-container-admin {
+    background-color: #fff8e1; /* Same light mango yellow as laptop */
+    border: 1px solid #ffcc80; /* Same mango orange border */
+  }
+
+  .stat-item-admin {
+    background-color: #fff3e0; /* Same softer mango yellow */
+    border: 1px solid #ffe0b2; /* Same light mango border */
+    color: #6d4c41; /* Same brown text for contrast */
+  }
+
+  .stat-item-admin h3 {
+    color: #ff6f00; /* Same vibrant mango orange */
+  }
+
+  .stat-item-admin p {
+    color: #6d4c41; /* Same brown text */
+  }
+}
+
 /* Responsive */
 @media (max-width: 768px) {
   .orders-table {
