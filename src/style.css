@@ -216,7 +216,7 @@ button:hover {
 
 .footer-note {
   font-size: 0.8rem;
-  color: #888;
+  color: #555; /* More readable shade of gray */
   margin-top: 1rem;
 }
 

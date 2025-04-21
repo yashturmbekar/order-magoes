@@ -6,36 +6,9 @@ import "odometer/themes/odometer-theme-default.css";
 import Header from "./sections/Header";
 import GetOrderDetails from "./routes/sections/GetOrderDetails";
 import OrderMangoes from "./routes/sections/OrderMangoes";
-
-// Statistics Component
-function Statistics({ statistics }) {
-  const [mangoesDelivered, setMangoesDelivered] = useState(0);
-  const [ordersReceived, setOrdersReceived] = useState(0);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setMangoesDelivered(statistics.totalMangoesDelivered);
-      setOrdersReceived(statistics.totalOrdersReceived);
-    }, 1500); // Increased delay for slower animation effect
-
-    return () => clearTimeout(timer);
-  }, [statistics]);
-
-  return (
-    <div className="statistics-container">
-      <div
-        className="stat-info"
-        style={{ textAlign: "center", fontSize: "1.2rem", color: "#4e342e" }}
-      >
-        <Odometer value={mangoesDelivered} format="(,ddd)" theme="default" />
-        <span> dozen of mangoes shared with </span>
-
-        <Odometer value={ordersReceived} format="(,ddd)" theme="default" />
-        <span> + mango lovers.</span>
-      </div>
-    </div>
-  );
-}
+import WhyChooseOurMangoes from "./sections/WhyChooseOurMangoes";
+import Statistics from "./sections/Statistics";
+import Footer from "./sections/Footer";
 
 // LandingPage Component
 export default function LandingPage() {
@@ -101,7 +74,6 @@ export default function LandingPage() {
 
     return () => clearInterval(interval);
   }, [photos.length]);
-
 
   const handleProceed = async () => {
     const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
@@ -374,11 +346,7 @@ export default function LandingPage() {
         {renderSection()}
 
         <div className="about-mangoes">
-          <h3>Why Choose Our Mangoes?</h3>
-          <p>🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked...</p>
-          <p>🚚 Delivered farm-fresh across Pune and nearby areas...</p>
-          <p>🌱 100% Carbide-free | GI-tag Certified | Taste Guaranteed</p>
-
+          <WhyChooseOurMangoes />
           <Statistics statistics={statistics} />
 
           <div
@@ -470,25 +438,7 @@ export default function LandingPage() {
         </Popup>
       )}
 
-      <footer className="footer">
-        <h4>Get in Touch</h4>
-        <div className="footer-details">
-          <p>
-            <strong>Yash Turmbekar</strong>
-          </p>
-          <p>
-            📞 <a href="tel:+918237381312">+91 82373 81312</a>
-          </p>
-          <p>
-            📧{" "}
-            <a href="mailto:yashturmbkar7@gmail.com">yashturmbkar7@gmail.com</a>
-          </p>
-          <p>📍 Pune, Maharashtra</p>
-        </div>
-        <p className="footer-note">
-          © 2025 Mangoes At Your Doorstep | All rights reserved
-        </p>
-      </footer>
+      <Footer />
     </div>
   );
 }
