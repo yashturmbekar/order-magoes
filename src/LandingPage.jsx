@@ -4,6 +4,8 @@ import Popup from "./utils/Popup";
 import Odometer from "react-odometerjs";
 import "odometer/themes/odometer-theme-default.css";
 import Header from "./sections/Header";
+import GetOrderDetails from "./routes/sections/GetOrderDetails";
+import OrderMangoes from "./routes/sections/OrderMangoes";
 
 // Statistics Component
 function Statistics({ statistics }) {
@@ -100,42 +102,6 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, [photos.length]);
 
-  // Validation
-  const validate = () => {
-    const newErrors = {};
-    if (!form.name.trim()) newErrors.name = "Name is required";
-    if (!/^\d{10}$/.test(form.phone))
-      newErrors.phone = "Enter a valid 10-digit WhatsApp number";
-    const qty = parseInt(form.quantity);
-    if (!qty || qty % 2 !== 0)
-      newErrors.quantity = "Enter dozens in multiples of 2";
-    if (!form.location.trim())
-      newErrors.location = "Delivery location is required";
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  // Handlers
-  const handleSubmit = async () => {
-    if (!validate()) return;
-
-    const order = {
-      name: form.name,
-      phone: form.phone,
-      quantity: parseInt(form.quantity),
-      location: form.location,
-      status: "New Order",
-    };
-
-    try {
-      await createOrder(order);
-      setPopupMessage(
-        "✅ Order placed successfully! Click 'Proceed' to send details on WhatsApp, or 'Cancel' to close this message."
-      );
-    } catch (err) {
-      alert("Something went wrong: " + err.message);
-    }
-  };
 
   const handleProceed = async () => {
     const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
@@ -153,14 +119,8 @@ export default function LandingPage() {
   };
 
   const handleGetOrdersAfterPlacedOrder = async () => {
-    const phone = form.phone;
-    if (!/^\d{10}$/.test(phone)) {
-      alert("Please enter a valid 10-digit phone number to fetch your orders.");
-      return;
-    }
-
     try {
-      const orders = await getOrderByPhone(phone);
+      const orders = await getOrderByPhone(form.phone); // Use form.phone instead of undefined phone
       if (orders.data.length === 0) {
         setUserOrders([]); // Clear old orders from the UI
         setPopupMessage(
@@ -175,42 +135,16 @@ export default function LandingPage() {
     }
   };
 
-  const handleGetOrders = async () => {
-    const newErrors = {};
-    if (!/^\d{10}$/.test(phoneForDetails)) {
-      setUserOrders([]); // Clear old orders from the UI
-      newErrors.phoneForGetOrderDetails =
-        "Please enter a valid 10-digit number used to place your order.";
-      setErrors(newErrors);
-      return;
-    } else {
-      setErrors({});
-    }
-    try {
-      const orders = await getOrderByPhone(phoneForDetails);
-      if (orders.data.length === 0) {
-        setUserOrders([]); // Clear old orders from the UI
-        setPopupMessage(
-          "0 active orders found for this mobile number. Please use a different mobile number."
-        );
-        return;
-      }
-      setUserOrders(orders.data);
-    } catch (err) {
-      alert("Failed to fetch orders: " + err.message);
-    }
-  };
-
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
-  };
-
   const handleSort = (key) => {
     let direction = "asc";
     if (sortConfig.key === key && sortConfig.direction === "asc") {
       direction = "desc";
     }
     setSortConfig({ key, direction });
+  };
+
+  const handleClose = () => {
+    setPopupMessage(""); // Close the popup
   };
 
   // Define sortedAndFilteredOrders based on userOrders, searchTerm, and sortConfig
@@ -238,253 +172,32 @@ export default function LandingPage() {
   const renderSection = () => {
     if (activeSection === "order") {
       return (
-        <div className="form-card">
-          <h2>Order Ratnagiri Hapus Mangoes</h2>
-          <input
-            placeholder="Your Name"
-            value={form.name}
-            onChange={(e) =>
-              /^[a-zA-Z\s]*$/.test(e.target.value) &&
-              setForm({ ...form, name: e.target.value })
-            }
-          />
-          {errors.name && <div className="error">{errors.name}</div>}
-
-          <input
-            placeholder="WhatsApp Phone Number"
-            value={form.phone}
-            onChange={(e) =>
-              /^\d{0,10}$/.test(e.target.value) &&
-              setForm({ ...form, phone: e.target.value })
-            }
-          />
-          {errors.phone && <div className="error">{errors.phone}</div>}
-
-          <input
-            type="number"
-            placeholder="Number of Dozens (multiple of 2)"
-            value={form.quantity}
-            onChange={(e) => setForm({ ...form, quantity: e.target.value })}
-          />
-          {errors.quantity && <div className="error">{errors.quantity}</div>}
-
-          <textarea
-            placeholder="Delivery Location"
-            value={form.location}
-            onChange={(e) => setForm({ ...form, location: e.target.value })}
-          />
-          {errors.location && <div className="error">{errors.location}</div>}
-
-          <button onClick={handleSubmit}>Order on WhatsApp</button>
-        </div>
+        <OrderMangoes
+          form={form}
+          setForm={setForm}
+          errors={errors}
+          setErrors={setErrors}
+          setPopupMessage={setPopupMessage}
+          handleGetOrdersAfterPlacedOrder={handleGetOrdersAfterPlacedOrder}
+        />
       );
     } else if (activeSection === "details") {
       return (
-        <div className="form-card">
-          <h2>Get Order Details</h2>
-          <input
-            placeholder="Enter Your Mobile Number Used To Place Your Order"
-            value={phoneForDetails}
-            onChange={(e) => {
-              if (/^\d{0,10}$/.test(e.target.value)) {
-                setPhoneForDetails(e.target.value);
-              }
-            }}
-          />
-          {errors.phoneForGetOrderDetails && (
-            <div className="error">{errors.phoneForGetOrderDetails}</div>
-          )}
-          <button onClick={handleGetOrders}>Get Order Details</button>
-
-          {userOrders && userOrders.length > 0 && (
-            <>
-              <input
-                type="text"
-                placeholder="Search orders..."
-                value={searchTerm}
-                onChange={handleSearch}
-                className="search-input"
-              />
-
-              <div className="table-wrapper">
-                <table className="orders-table">
-                  <thead>
-                    <tr>
-                      <th>#</th>
-                      <th onClick={() => handleSort("orderId")}>
-                        Order Id{" "}
-                        {sortConfig.key === "orderId"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("name")}>
-                        Name{" "}
-                        {sortConfig.key === "name"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("phone")}>
-                        Phone{" "}
-                        {sortConfig.key === "phone"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("quantity")}>
-                        Qty{" "}
-                        {sortConfig.key === "quantity"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("location")}>
-                        Delivery Location{" "}
-                        {sortConfig.key === "location"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("createdAt")}>
-                        Order Date{" "}
-                        {sortConfig.key === "createdAt"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("lastUpdatedAt")}>
-                        Last Updated{" "}
-                        {sortConfig.key === "lastUpdatedAt"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("orderStatus")}>
-                        Order Status{" "}
-                        {sortConfig.key === "orderStatus"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                      <th onClick={() => handleSort("paymentStatus")}>
-                        Payment Status{" "}
-                        {sortConfig.key === "paymentStatus"
-                          ? sortConfig.direction === "asc"
-                            ? "▲"
-                            : "▼"
-                          : "▲▼"}
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sortedAndFilteredOrders.map((order, index) => {
-                      const getRowClass = () => {
-                        if (
-                          order.orderStatus === "delivered" &&
-                          order.paymentStatus === "completed"
-                        )
-                          return "order-received-payment-completed";
-                        if (order.orderStatus === "order_received")
-                          return "order-received";
-                        if (order.orderStatus === "in_progress")
-                          return "in-progress";
-                        if (order.orderStatus === "out_for_delivery")
-                          return "out-for-delivery";
-                        if (
-                          order.orderStatus === "delivered" &&
-                          order.paymentStatus !== "completed"
-                        )
-                          return "delivered";
-                        return "";
-                      };
-
-                      const rowClass = getRowClass();
-
-                      return (
-                        <tr
-                          key={order.id}
-                          className={`${rowClass} ${
-                            order.isActive === false ? "inactive-row" : ""
-                          }`}
-                          style={{
-                            backgroundColor:
-                              order.isActive === false ? "#D3D3D3" : "", // Light gray
-                            color: order.isActive === false ? "red" : "",
-                          }}
-                        >
-                          <td>{index + 1}</td>
-                          <td>{order.orderId}</td>
-                          <td>{order.name}</td>
-                          <td>{order.phone}</td>
-                          <td>{order.quantity}</td>
-                          <td>{order.location}</td>
-                          <td>{`${new Date(
-                            order.createdAt
-                          ).toLocaleDateString()} ${new Date(
-                            order.createdAt
-                          ).toLocaleTimeString([], {
-                            hour: "2-digit",
-                            minute: "2-digit",
-                          })}`}</td>
-                          <td>
-                            {order.lastUpdatedAt &&
-                            !isNaN(new Date(order.lastUpdatedAt).getTime())
-                              ? `${new Date(
-                                  order.lastUpdatedAt
-                                ).toLocaleDateString()} ${new Date(
-                                  order.lastUpdatedAt
-                                ).toLocaleTimeString([], {
-                                  hour: "2-digit",
-                                  minute: "2-digit",
-                                })}`
-                              : "N/A"}
-                          </td>
-                          <td>
-                            {(() => {
-                              switch (order.orderStatus) {
-                                case "order_received":
-                                  return "Order Received";
-                                case "in_progress":
-                                  return "In Progress";
-                                case "out_for_delivery":
-                                  return "Out for Delivery";
-                                case "delivered":
-                                  return "Delivered Successfully";
-                                default:
-                                  return "Unknown";
-                              }
-                            })()}
-                          </td>
-                          <td>
-                            {(() => {
-                              switch (order.paymentStatus) {
-                                case "pending":
-                                  return "Payment Pending";
-                                case "completed":
-                                  return "Payment Completed";
-                                default:
-                                  return "Unknown";
-                              }
-                            })()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            </>
-          )}
-        </div>
+        <GetOrderDetails
+          phoneForDetails={phoneForDetails}
+          setPhoneForDetails={setPhoneForDetails}
+          userOrders={userOrders}
+          setUserOrders={setUserOrders}
+          errors={errors}
+          setErrors={setErrors}
+          searchTerm={searchTerm}
+          setSearchTerm={setSearchTerm}
+          sortConfig={sortConfig}
+          setSortConfig={setSortConfig}
+          handleSort={handleSort}
+          sortedAndFilteredOrders={sortedAndFilteredOrders}
+          setPopupMessage={setPopupMessage}
+        />
       );
     }
     return null;
@@ -713,37 +426,47 @@ export default function LandingPage() {
       </div>
 
       {popupMessage && (
-        <Popup message={popupMessage} hideCloseButton={true}>
-          <div
-            style={{ display: "flex", justifyContent: "center", gap: "10px" }}
-          >
-            <button
-              onClick={handleProceed}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#4CAF50",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
+        <Popup
+          message={popupMessage}
+          hideCloseButton={
+            popupMessage ===
+            "✅ Order placed successfully! Click 'Proceed' to send details on WhatsApp, or 'Cancel' to close this message."
+          }
+          onClose={handleClose}
+        >
+          {popupMessage ===
+          "0 active orders found for this mobile number. Please use a different mobile number." ? null : (
+            <div
+              style={{ display: "flex", justifyContent: "center", gap: "10px" }}
             >
-              Proceed
-            </button>
-            <button
-              onClick={handleCancel}
-              style={{
-                padding: "10px 20px",
-                backgroundColor: "#f44336",
-                color: "white",
-                border: "none",
-                borderRadius: "5px",
-                cursor: "pointer",
-              }}
-            >
-              Cancel
-            </button>
-          </div>
+              <button
+                onClick={handleProceed}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#4CAF50",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Proceed
+              </button>
+              <button
+                onClick={handleCancel}
+                style={{
+                  padding: "10px 20px",
+                  backgroundColor: "#f44336",
+                  color: "white",
+                  border: "none",
+                  borderRadius: "5px",
+                  cursor: "pointer",
+                }}
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </Popup>
       )}
 

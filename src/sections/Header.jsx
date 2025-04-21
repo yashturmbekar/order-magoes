@@ -17,10 +17,17 @@ const Header = () => {
     }
   };
 
+  const getTagline = () => {
+    if (location.pathname === "/admin/orders") {
+      return "Admin Dashboard";
+    }
+    return "यह बात सिर्फ आम ही नहीं, काम की भी है";
+  };
+
   return (
     <header>
       <div className="hero">
-        <p className="tagline">Admin Dashboard</p>
+        <p className="tagline">{getTagline()}</p>
         <h1
           onClick={() => (window.location.href = "/")}
           style={{ cursor: "pointer" }}
