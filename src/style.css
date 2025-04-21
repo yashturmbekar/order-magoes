@@ -24,7 +24,7 @@ body {
 }
 
 .falling-mangoes {
-  position: fixed;
+  position: relative;
   top: 0;
   left: 0;
   width: 100%;
@@ -433,6 +433,29 @@ button:hover {
 
 .popup .cancel-btn:hover {
   background-color: #d32f2f;
+}
+
+.popup-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+}
+
+.popup-buttons button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.popup-buttons .proceed {
+  background-color: #4caf50;
+  color: white;
+}
+
+.popup-buttons .cancel {
+  background-color: #f44336;
+  color: white;
 }
 
 .statistics-container {
@@ -900,4 +923,68 @@ button:hover {
 
 .pagination-btn.active {
   background-color: #4caf50;
+}
+
+/* Moved CSS styles from LandingPage.jsx */
+
+.button-group {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.fancy-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  transition: transform 1.2s ease;
+}
+
+.fancy-button img {
+  width: 150px;
+  height: 150px;
+  transition: transform 1.2s ease;
+}
+
+.fancy-button div {
+  text-align: center;
+  margin-top: 10px;
+  transition: transform 1.2s ease;
+}
+
+.fancy-button p {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff4500;
+  font-family: "Nunito", sans-serif;
+  animation: fadeInText 1.2s ease-in-out;
+  margin-top: 10px;
+}
+
+.photo-carousel {
+  display: flex;
+  overflow: hidden;
+  width: 100%;
+  max-width: 900px;
+  margin: 20px auto 0;
+}
+
+.carousel-track {
+  display: flex;
+  transition: transform 0.5s ease-in-out;
+}
+
+.carousel-track img {
+  width: 33.33%;
+  flex-shrink: 0;
+  height: auto;
+  border-radius: 10px;
+  margin: 0 10px;
+  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
