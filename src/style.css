@@ -100,7 +100,6 @@ h1 {
   display: inline-block;
 }
 
-
 /* About Section */
 .why-choose-our-mangoes {
   background: linear-gradient(to left, #fff8dc, #fedaa3);
@@ -719,6 +718,7 @@ button:hover {
 @media (max-width: 768px) {
   .orders-table {
     font-size: 0.85rem;
+    padding: 0 10px; /* Add padding for better spacing on mobile */
   }
 
   .orders-table th,
