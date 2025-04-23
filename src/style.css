@@ -102,7 +102,7 @@ h1 {
 
 /* About Section */
 .about-mangoes {
-  background-color: #fff8dc;
+  background: linear-gradient(to right, #fff8dc, #ffbe5c);
   padding: 1rem;
   border-radius: 12px;
   margin-top: 2rem;
