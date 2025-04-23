@@ -12,6 +12,8 @@ const Header = () => {
         return "Admin Panel";
       case "/":
         return "Anywhere in Pune, Excluding Muslims";
+      case "/orderdetails":
+        return "Anywhere in Pune, Excluding Muslims";
       default:
         return "";
     }
