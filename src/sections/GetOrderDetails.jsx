@@ -1,7 +1,7 @@
 // Create a new component for GetOrderDetails
 import React, { useState, useEffect } from "react";
-import { getOrderByPhone } from "../../utils/api";
-import Popup from "../../utils/api";
+import { getOrderByPhone } from "../utils/api";
+import Popup from "../utils/api";
 
 export default function GetOrderDetails({
   phoneForDetails,
@@ -52,42 +52,42 @@ export default function GetOrderDetails({
   };
 
   const handleProceed = async () => {
-      const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
-      const url = `https://wa.me/918830997757?text=${encodeURIComponent(
-        message
-      )}`;
-      window.open(url, "_blank");
-      setPopupMessage(""); // Close the popup after proceeding
-      await handleGetOrdersAfterPlacedOrder();
-    };
-  
-    const handleCancel = async () => {
-      setPopupMessage(""); // Close the popup
-      await handleGetOrdersAfterPlacedOrder();
-    };
-  
-    const handleGetOrdersAfterPlacedOrder = async () => {
-      const phone = form.phone;
-      if (!/^\d{10}$/.test(phone)) {
-        alert("Please enter a valid 10-digit phone number to fetch your orders.");
+    const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
+    const url = `https://wa.me/918830997757?text=${encodeURIComponent(
+      message
+    )}`;
+    window.open(url, "_blank");
+    setPopupMessage(""); // Close the popup after proceeding
+    await handleGetOrdersAfterPlacedOrder();
+  };
+
+  const handleCancel = async () => {
+    setPopupMessage(""); // Close the popup
+    await handleGetOrdersAfterPlacedOrder();
+  };
+
+  const handleGetOrdersAfterPlacedOrder = async () => {
+    const phone = form.phone;
+    if (!/^\d{10}$/.test(phone)) {
+      alert("Please enter a valid 10-digit phone number to fetch your orders.");
+      return;
+    }
+
+    try {
+      const orders = await getOrderByPhone(phone);
+      if (orders.data.length === 0) {
+        setUserOrders([]); // Clear old orders from the UI
+        setPopupMessage(
+          "0 active orders found for this mobile number. Please use a different mobile number."
+        );
         return;
       }
-  
-      try {
-        const orders = await getOrderByPhone(phone);
-        if (orders.data.length === 0) {
-          setUserOrders([]); // Clear old orders from the UI
-          setPopupMessage(
-            "0 active orders found for this mobile number. Please use a different mobile number."
-          );
-          return;
-        }
-        setUserOrders(orders.data);
-        setActiveSection("details"); // Navigate to the order details section
-      } catch (err) {
-        alert("Failed to fetch orders: " + err.message);
-      }
-    };
+      setUserOrders(orders.data);
+      setActiveSection("details"); // Navigate to the order details section
+    } catch (err) {
+      alert("Failed to fetch orders: " + err.message);
+    }
+  };
   const handleSearch = (e) => {
     setSearchTerm(e.target.value.toLowerCase());
   };

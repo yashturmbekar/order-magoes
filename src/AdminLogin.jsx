@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "./utils/api";
 import Header from "./sections/Header";
+import Footer from "./sections/Footer";
 
 export default function AdminLogin() {
   const [username, setUsername] = useState("");
@@ -50,27 +51,7 @@ export default function AdminLogin() {
           </div>
         </div>
 
-        <footer className="footer">
-          <h4>Contact Support</h4>
-          <div className="footer-details">
-            <p>
-              <strong>Yash Turmbekar</strong>
-            </p>
-            <p>
-              📞 <a href="tel:+918237381312">+91 82373 81312</a>
-            </p>
-            <p>
-              📧{" "}
-              <a href="mailto:yashturmbkar7@gmail.com">
-                yashturmbkar7@gmail.com
-              </a>
-            </p>
-            <p>📍 Pune, Maharashtra</p>
-          </div>
-          <p className="footer-note">
-            © 2025 Mangoes At Your Doorstep | Admin Panel
-          </p>
-        </footer>
+        <Footer />
       </div>
     </div>
   );

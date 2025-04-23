@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import { createOrder, getOrderByPhone } from "../../utils/api";
-import Popup from "../../utils/Popup";
+import { createOrder, getOrderByPhone } from "../utils/api";
+import Popup from "../utils/Popup";
 
 export default function OrderMangoes({
   form,
