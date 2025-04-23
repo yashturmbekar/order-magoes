@@ -40,7 +40,6 @@ function PrivateRoute({ children, requiredRole }) {
   return children;
 }
 
-
 export default function AppRouter() {
   return (
     <Router basename="/">
@@ -55,6 +54,7 @@ export default function AppRouter() {
             </PrivateRoute>
           }
         />
+        <Route path="/orderdetails" element={<LandingPage />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

@@ -9,6 +9,7 @@ import OrderMangoes from "./sections/OrderMangoes";
 import WhyChooseOurMangoes from "./sections/WhyChooseOurMangoes";
 import Statistics from "./sections/Statistics";
 import Footer from "./sections/Footer";
+import { useSearchParams } from "react-router-dom";
 
 // LandingPage Component
 export default function LandingPage() {
@@ -33,6 +34,7 @@ export default function LandingPage() {
   });
   const [searchTerm, setSearchTerm] = useState("");
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [searchParams] = useSearchParams();
 
   // Constants
   const photos = [
@@ -75,6 +77,15 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, [photos.length]);
 
+  useEffect(() => {
+    const mobileNumber = searchParams.get("mobilenumber");
+    if (mobileNumber) {
+      setPhoneForDetails(mobileNumber);
+      setActiveSection("details");
+      handleGetOrdersAfterPlacedOrder(mobileNumber);
+    }
+  }, [searchParams]);
+
   const handleProceed = async () => {
     const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
     const url = `https://wa.me/918830997757?text=${encodeURIComponent(
@@ -90,9 +101,10 @@ export default function LandingPage() {
     await handleGetOrdersAfterPlacedOrder();
   };
 
-  const handleGetOrdersAfterPlacedOrder = async () => {
+  const handleGetOrdersAfterPlacedOrder = async (phone) => {
     try {
-      const orders = await getOrderByPhone(form.phone); // Use form.phone instead of undefined phone
+      const phoneToUse = form.phone || phone; // Check if form.phone is null, fallback to phone
+      const orders = await getOrderByPhone(phoneToUse);
       if (orders.data.length === 0) {
         setUserOrders([]); // Clear old orders from the UI
         setPopupMessage(
