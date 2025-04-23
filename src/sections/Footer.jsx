@@ -5,7 +5,7 @@ const Footer = () => {
   return (
     <footer
       className="footer"
-      style={{ background: "linear-gradient(to right, #fff8dc, #ffbe5c)" }}
+      style={{ background: "linear-gradient(to right, #fff8dc, #fed08b)" }}
     >
       <h4>Get in Touch</h4>
       <div className="footer-details">

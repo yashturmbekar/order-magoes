@@ -100,14 +100,24 @@ h1 {
   display: inline-block;
 }
 
+
 /* About Section */
-.about-mangoes {
-  background: linear-gradient(to right, #fff8dc, #ffbe5c);
+.why-choose-our-mangoes {
+  background: linear-gradient(to left, #fff8dc, #fed08b);
   padding: 1rem;
   border-radius: 12px;
   margin-top: 2rem;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+/* About Section */
+.about-mangoes {
+  background: linear-gradient(to right, #fff8dc, #fed08b);
+  padding: 1rem;
+  border-radius: 12px;
+  margin-top: 2rem;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 }
 
 .about-mangoes h3 {

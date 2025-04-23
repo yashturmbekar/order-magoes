@@ -2,7 +2,7 @@ import React from "react";
 
 const WhyChooseOurMangoes = () => {
   return (
-    <div className="about-mangoes">
+    <div className="why-choose-our-mangoes">
       <h3>Why Choose Our Mangoes?</h3>
       <p>🍋 Our premium-grade Ratnagiri Hapus mangoes are handpicked...</p>
       <p>🚚 Delivered farm-fresh across Pune and nearby areas...</p>
