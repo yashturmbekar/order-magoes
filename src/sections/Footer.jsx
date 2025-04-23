@@ -2,7 +2,7 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className="footer">
+    <footer className="footer" style={{ backgroundColor: "#fff8dc" }}>
       <h4>Get in Touch</h4>
       <div className="footer-details">
         <p>
