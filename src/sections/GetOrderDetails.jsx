@@ -1,7 +1,13 @@
 // Create a new component for GetOrderDetails
 import React, { useState, useEffect } from "react";
 import { getOrderByPhone } from "../utils/api";
-import Popup from "../utils/api";
+import {
+  validatePhoneNumber,
+  formatOrderDate,
+  getOrderRowClass,
+  getOrderStatusText,
+  getPaymentStatusText,
+} from "../utils/helpers";
 
 export default function GetOrderDetails({
   phoneForDetails,
@@ -18,16 +24,19 @@ export default function GetOrderDetails({
   sortedAndFilteredOrders,
   setPopupMessage,
 }) {
-  // Ensure sorting indicators are displayed for all columns on page load
   useEffect(() => {
     if (!sortConfig.key) {
-      setSortConfig({ key: "orderId", direction: "asc" });
+      setSortConfig({ key: "Id", direction: "asc" });
     }
   }, []);
 
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
+  };
+
   const handleGetOrders = async () => {
     const newErrors = {};
-    if (!/^\d{10}$/.test(phoneForDetails)) {
+    if (!validatePhoneNumber(phoneForDetails)) {
       setUserOrders([]); // Clear old orders from the UI
       newErrors.phoneForGetOrderDetails =
         "Please enter a valid 10-digit number used to place your order.";
@@ -38,58 +47,20 @@ export default function GetOrderDetails({
     }
     try {
       const orders = await getOrderByPhone(phoneForDetails);
-      if (orders.data.length === 0) {
+      if (orders.data.orderDetails.length === 0) {
         setUserOrders([]); // Clear old orders from the UI
         setPopupMessage(
           "0 active orders found for this mobile number. Please use a different mobile number."
         );
         return;
+      } else {
+        localStorage.setItem("accessToken", orders.data.access_token);
+        document.cookie = `refreshToken=${orders.data.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
+        setUserOrders(orders.data.orderDetails);
       }
-      setUserOrders(orders.data);
     } catch (err) {
       alert("Failed to fetch orders: " + err.message);
     }
-  };
-
-  const handleProceed = async () => {
-    const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
-    const url = `https://wa.me/918830997757?text=${encodeURIComponent(
-      message
-    )}`;
-    window.open(url, "_blank");
-    setPopupMessage(""); // Close the popup after proceeding
-    await handleGetOrdersAfterPlacedOrder();
-  };
-
-  const handleCancel = async () => {
-    setPopupMessage(""); // Close the popup
-    await handleGetOrdersAfterPlacedOrder();
-  };
-
-  const handleGetOrdersAfterPlacedOrder = async () => {
-    const phone = form.phone;
-    if (!/^\d{10}$/.test(phone)) {
-      alert("Please enter a valid 10-digit phone number to fetch your orders.");
-      return;
-    }
-
-    try {
-      const orders = await getOrderByPhone(phone);
-      if (orders.data.length === 0) {
-        setUserOrders([]); // Clear old orders from the UI
-        setPopupMessage(
-          "0 active orders found for this mobile number. Please use a different mobile number."
-        );
-        return;
-      }
-      setUserOrders(orders.data);
-      setActiveSection("details"); // Navigate to the order details section
-    } catch (err) {
-      alert("Failed to fetch orders: " + err.message);
-    }
-  };
-  const handleSearch = (e) => {
-    setSearchTerm(e.target.value.toLowerCase());
   };
 
   const getSortIndicator = (key) => {
@@ -126,7 +97,7 @@ export default function GetOrderDetails({
             className="search-input"
           />
 
-          <div className="table-wrapper">
+          <div className="table-wrapper" style={{ background: "#fff8dc" }}>
             <table className="orders-table">
               <thead>
                 <tr>
@@ -162,27 +133,7 @@ export default function GetOrderDetails({
               </thead>
               <tbody>
                 {sortedAndFilteredOrders.map((order, index) => {
-                  const getRowClass = () => {
-                    if (
-                      order.orderStatus === "delivered" &&
-                      order.paymentStatus === "completed"
-                    )
-                      return "order-received-payment-completed";
-                    if (order.orderStatus === "order_received")
-                      return "order-received";
-                    if (order.orderStatus === "in_progress")
-                      return "in-progress";
-                    if (order.orderStatus === "out_for_delivery")
-                      return "out-for-delivery";
-                    if (
-                      order.orderStatus === "delivered" &&
-                      order.paymentStatus !== "completed"
-                    )
-                      return "delivered";
-                    return "";
-                  };
-
-                  const rowClass = getRowClass();
+                  const rowClass = getOrderRowClass(order);
 
                   return (
                     <tr
@@ -202,55 +153,15 @@ export default function GetOrderDetails({
                       <td>{order.phone}</td>
                       <td>{order.quantity}</td>
                       <td>{order.location}</td>
-                      <td>{`${new Date(
-                        order.createdAt
-                      ).toLocaleDateString()} ${new Date(
-                        order.createdAt
-                      ).toLocaleTimeString([], {
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}`}</td>
+                      <td>{formatOrderDate(order.createdAt)}</td>
                       <td>
                         {order.lastUpdatedAt &&
                         !isNaN(new Date(order.lastUpdatedAt).getTime())
-                          ? `${new Date(
-                              order.lastUpdatedAt
-                            ).toLocaleDateString()} ${new Date(
-                              order.lastUpdatedAt
-                            ).toLocaleTimeString([], {
-                              hour: "2-digit",
-                              minute: "2-digit",
-                            })}`
+                          ? formatOrderDate(order.lastUpdatedAt)
                           : "N/A"}
                       </td>
-                      <td>
-                        {(() => {
-                          switch (order.orderStatus) {
-                            case "order_received":
-                              return "Order Received";
-                            case "in_progress":
-                              return "In Progress";
-                            case "out_for_delivery":
-                              return "Out for Delivery";
-                            case "delivered":
-                              return "Delivered Successfully";
-                            default:
-                              return "Unknown";
-                          }
-                        })()}
-                      </td>
-                      <td>
-                        {(() => {
-                          switch (order.paymentStatus) {
-                            case "pending":
-                              return "Payment Pending";
-                            case "completed":
-                              return "Payment Completed";
-                            default:
-                              return "Unknown";
-                          }
-                        })()}
-                      </td>
+                      <td>{getOrderStatusText(order.orderStatus)}</td>
+                      <td>{getPaymentStatusText(order.paymentStatus)}</td>
                     </tr>
                   );
                 })}

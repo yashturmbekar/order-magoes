@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { createOrder, getOrderByPhone, fetchAllStatistics } from "./utils/api";
 import Popup from "./utils/Popup";
-import Odometer from "react-odometerjs";
 import "odometer/themes/odometer-theme-default.css";
 import Header from "./sections/Header";
 import GetOrderDetails from "./sections/GetOrderDetails";
@@ -10,6 +9,7 @@ import WhyChooseOurMangoes from "./sections/WhyChooseOurMangoes";
 import Statistics from "./sections/Statistics";
 import Footer from "./sections/Footer";
 import { useSearchParams } from "react-router-dom";
+import { getSortedAndFilteredOrders } from "./utils/helpers";
 
 // LandingPage Component
 export default function LandingPage() {
@@ -72,7 +72,7 @@ export default function LandingPage() {
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
-    }, 3000); // Automatically move to the next photo every 3 seconds
+    }, 3000);
 
     return () => clearInterval(interval);
   }, [photos.length]);
@@ -80,6 +80,7 @@ export default function LandingPage() {
   useEffect(() => {
     const mobileNumber = searchParams.get("mobilenumber");
     if (mobileNumber) {
+      console.log("Mobile number from URL:", mobileNumber);
       setPhoneForDetails(mobileNumber);
       setActiveSection("details");
       handleGetOrdersAfterPlacedOrder(mobileNumber);
@@ -92,31 +93,30 @@ export default function LandingPage() {
       message
     )}`;
     window.open(url, "_blank");
-    setPopupMessage(""); // Close the popup after proceeding
+    setPopupMessage("");
     await handleGetOrdersAfterPlacedOrder();
   };
 
   const handleCancel = async () => {
-    setPopupMessage(""); // Close the popup
+    setPopupMessage("");
     await handleGetOrdersAfterPlacedOrder();
   };
 
-  const handleGetOrdersAfterPlacedOrder = async (phone) => {
+  const handleGetOrdersAfterPlacedOrder = async (mobileNumber) => {
+    const phone = form.phone || mobileNumber;
     try {
-      const phoneToUse = form.phone || phone; // Check if form.phone is null, fallback to phone
-      const orders = await getOrderByPhone(phoneToUse);
-      if (orders.data.length === 0) {
-        setUserOrders([]); // Clear old orders from the UI
-        setPopupMessage(
-          "0 active orders found for this mobile number. Please use a different mobile number."
-        );
-        return;
-      }
-      setUserOrders(orders.data);
-      setActiveSection("details"); // Navigate to the order details section
+      const orders = await getOrderByPhone(phone);
+      localStorage.setItem("accessToken", orders.data.access_token);
+      document.cookie = `refreshToken=${orders.data.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
+      setUserOrders(orders.data.orderDetails);
+      setActiveSection("details");
+      setPhoneForDetails(phone);
     } catch (err) {
-      alert("Failed to fetch orders: " + err.message);
+      setPopupMessage("Failed to fetch orders");
     }
+  };
+  const handleSearch = (e) => {
+    setSearchTerm(e.target.value.toLowerCase());
   };
 
   const handleSort = (key) => {
@@ -131,26 +131,11 @@ export default function LandingPage() {
     setPopupMessage(""); // Close the popup
   };
 
-  // Define sortedAndFilteredOrders based on userOrders, searchTerm, and sortConfig
-  const sortedAndFilteredOrders = userOrders
-    .filter((order) => {
-      // Filter orders based on the search term
-      return (
-        order.name.toLowerCase().includes(searchTerm) ||
-        order.phone.includes(searchTerm) ||
-        order.location.toLowerCase().includes(searchTerm)
-      );
-    })
-    .sort((a, b) => {
-      // Sort orders based on the sortConfig
-      if (!sortConfig.key) return 0;
-      const aValue = a[sortConfig.key];
-      const bValue = b[sortConfig.key];
-
-      if (aValue < bValue) return sortConfig.direction === "asc" ? -1 : 1;
-      if (aValue > bValue) return sortConfig.direction === "asc" ? 1 : -1;
-      return 0;
-    });
+  const sortedAndFilteredOrders = getSortedAndFilteredOrders(
+    userOrders,
+    searchTerm,
+    sortConfig
+  );
 
   // Render Section
   const renderSection = () => {
