@@ -1,5 +1,6 @@
 import axios from "axios";
 import { config } from "./config";
+import { storeTokens } from "./helpers";
 
 const API_BASE = config.API_BASE;
 
@@ -65,9 +66,7 @@ api.interceptors.response.use(
 
 export const loginAdmin = async (credentials) => {
   const response = await api.post("/auth/login", credentials);
-  localStorage.setItem("accessToken", response.data.accessToken);
-  // Set refreshToken into a secure HttpOnly cookie
-  document.cookie = `refreshToken=${response.data.refreshToken}; HttpOnly; Secure; SameSite=Strict; path=/`;
+  storeTokens(response.data.accessToken, response.data.refreshToken);
   return response.data;
 };
 

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginAdmin } from "./utils/api";
+import { storeTokens } from "./utils/helpers";
 import Header from "./sections/Header";
 import Footer from "./sections/Footer";
 
@@ -13,9 +14,7 @@ export default function AdminLogin() {
   const handleLogin = async () => {
     try {
       const response = await loginAdmin({ username, password });
-      localStorage.setItem("accessToken", response.access_token);
-      // Set refreshToken into a secure HttpOnly cookie
-      document.cookie = `refreshToken=${response.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
+      storeTokens(response.access_token, response.refresh_token);
       navigate("/admin/orders");
     } catch (err) {
       setError("Login failed. Please check your credentials.");

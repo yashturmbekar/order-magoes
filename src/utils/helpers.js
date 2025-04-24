@@ -93,3 +93,19 @@ export function getPaymentStatusText(paymentStatus) {
       return "Unknown";
   }
 }
+
+// Utility function to generate WhatsApp order message
+export function generateWhatsAppMessage(form) {
+  return `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
+}
+
+// Utility function to handle photo carousel index calculation
+export function calculatePhotoIndex(currentIndex, totalPhotos) {
+  return (currentIndex + 1) % totalPhotos;
+}
+
+// Utility function to store tokens in localStorage and cookies
+export function storeTokens(accessToken, refreshToken) {
+  localStorage.setItem("accessToken", accessToken);
+  document.cookie = `refreshToken=${refreshToken}; HttpOnly; Secure; SameSite=Strict; path=/`;
+}

@@ -9,7 +9,12 @@ import WhyChooseOurMangoes from "./sections/WhyChooseOurMangoes";
 import Statistics from "./sections/Statistics";
 import Footer from "./sections/Footer";
 import { useSearchParams } from "react-router-dom";
-import { getSortedAndFilteredOrders } from "./utils/helpers";
+import {
+  getSortedAndFilteredOrders,
+  generateWhatsAppMessage,
+  calculatePhotoIndex,
+  storeTokens,
+} from "./utils/helpers";
 
 // LandingPage Component
 export default function LandingPage() {
@@ -20,6 +25,7 @@ export default function LandingPage() {
     quantity: "",
     location: "",
   });
+
   const [errors, setErrors] = useState({});
   const [showAnimation, setShowAnimation] = useState(true);
   const [userOrders, setUserOrders] = useState([]);
@@ -71,7 +77,9 @@ export default function LandingPage() {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCurrentPhotoIndex((prevIndex) => (prevIndex + 1) % photos.length);
+      setCurrentPhotoIndex((prevIndex) =>
+        calculatePhotoIndex(prevIndex, photos.length)
+      );
     }, 3000);
 
     return () => clearInterval(interval);
@@ -88,7 +96,7 @@ export default function LandingPage() {
   }, [searchParams]);
 
   const handleProceed = async () => {
-    const message = `Hello, I want to order ${form.quantity} dozen(s) of Ratnagiri Hapus mangoes.\n\nName: ${form.name}\nPhone: ${form.phone}\nDelivery Location: ${form.location}`;
+    const message = generateWhatsAppMessage(form);
     const url = `https://wa.me/918830997757?text=${encodeURIComponent(
       message
     )}`;
@@ -106,8 +114,7 @@ export default function LandingPage() {
     const phone = form.phone || mobileNumber;
     try {
       const orders = await getOrderByPhone(phone);
-      localStorage.setItem("accessToken", orders.data.access_token);
-      document.cookie = `refreshToken=${orders.data.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
+      storeTokens(orders.data.access_token, orders.data.refresh_token);
       setUserOrders(orders.data.orderDetails);
       setActiveSection("details");
       setPhoneForDetails(phone);

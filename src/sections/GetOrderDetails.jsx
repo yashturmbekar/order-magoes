@@ -7,6 +7,7 @@ import {
   getOrderRowClass,
   getOrderStatusText,
   getPaymentStatusText,
+  storeTokens,
 } from "../utils/helpers";
 
 export default function GetOrderDetails({
@@ -54,8 +55,7 @@ export default function GetOrderDetails({
         );
         return;
       } else {
-        localStorage.setItem("accessToken", orders.data.access_token);
-        document.cookie = `refreshToken=${orders.data.refresh_token}; HttpOnly; Secure; SameSite=Strict; path=/`;
+        storeTokens(orders.data.access_token, orders.data.refresh_token);
         setUserOrders(orders.data.orderDetails);
       }
     } catch (err) {
