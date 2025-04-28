@@ -6,10 +6,10 @@ export default function PhotoCarousel() {
 
   const photos = useMemo(
     () => [
-      "/real-mango-1.jpg",
-      "/real-mango-2.jpg",
-      "/real-mango-3.JPG",
-      "/real-mango-4.jpg",
+      "/src/assets/images/real-mango-1.jpg",
+      "/src/assets/images/real-mango-2.jpg",
+      "/src/assets/images/real-mango-3.JPG",
+      "/src/assets/images/real-mango-4.jpg",
     ],
     []
   );

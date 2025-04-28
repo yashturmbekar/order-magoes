@@ -41,10 +41,10 @@ export default function LandingPage() {
 
   const photos = useMemo(
     () => [
-      "/real-mango-1.jpg",
-      "/real-mango-2.jpg",
-      "/real-mango-3.JPG",
-      "/real-mango-4.jpg",
+      "/src/assets/images/real-mango-1.jpg",
+      "/src/assets/images/real-mango-2.jpg",
+      "/src/assets/images/real-mango-3.JPG",
+      "/src/assets/images/real-mango-4.jpg",
     ],
     []
   );
@@ -202,7 +202,7 @@ export default function LandingPage() {
             return (
               <img
                 key={i}
-                src="/mango-icon.png"
+                src="/src/assets/images/mango-icon.png"
                 className="mango"
                 style={{
                   left: `${left}%`,
@@ -262,7 +262,7 @@ export default function LandingPage() {
           >
             <img
               id="order-image"
-              src="/order-magoes.png"
+              src="/src/assets/images/order-magoes.png"
               alt="Order Mangoes"
               style={{
                 width: "150px",
@@ -325,7 +325,7 @@ export default function LandingPage() {
           >
             <img
               id="details-image"
-              src="/get-order-details.png"
+              src="/src/assets/images/get-order-details.png"
               alt="Get Order Details"
               style={{
                 width: "150px",

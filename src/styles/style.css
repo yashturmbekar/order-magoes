@@ -13,7 +13,7 @@ body {
 
 .page {
   min-height: 100vh;
-  background-image: url("/mango-bg.jpg");
+  background-image: url("/src/assets/images/mango-bg.jpg");
   background-size: cover;
   background-position: center;
   padding: 2rem 1rem;

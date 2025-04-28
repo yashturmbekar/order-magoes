@@ -68,7 +68,7 @@ export default function App() {
               return (
                 <img
                   key={i}
-                  src="/mango-icon.png"
+                  src="/src/assets/images/mango-icon.png"
                   className="mango"
                   style={{
                     left: `${left}%`,
