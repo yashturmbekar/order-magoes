@@ -7,10 +7,10 @@ import {
   activateOrder,
   getDeliveryStatistics,
   getGroupedDeliveryOrders,
-} from "./utils/api";
-import Popup from "./utils/Popup";
+} from "../utils/api";
+import Popup from "../utils/Popup";
 import Odometer from "react-odometerjs";
-import Header from "./sections/Header";
+import Header from "../components/Header";
 
 function Statistics({ statistics, onStatisticClick }) {
   const [dozensDelivered, setDozensDelivered] = useState(0);
@@ -273,7 +273,7 @@ export default function AdminOrders() {
   };
 
   useEffect(() => {
-    setCurrentPage(1); 
+    setCurrentPage(1);
     setSortConfig({ key: null, direction: "asc" });
   }, [filteredOrders]);
 

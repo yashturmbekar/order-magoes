@@ -1,31 +1,29 @@
-import React, { useEffect, useState } from "react";
-import { createOrder, getOrderByPhone, fetchAllStatistics } from "./utils/api";
-import Popup from "./utils/Popup";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import Popup from "../utils/Popup";
 import "odometer/themes/odometer-theme-default.css";
-import Header from "./sections/Header";
-import GetOrderDetails from "./sections/GetOrderDetails";
-import OrderMangoes from "./sections/OrderMangoes";
-import WhyChooseOurMangoes from "./sections/WhyChooseOurMangoes";
-import Statistics from "./sections/Statistics";
-import Footer from "./sections/Footer";
+import Header from "../components/Header";
+import GetOrderDetails from "../components/GetOrderDetails";
+import OrderMangoes from "../components/OrderMangoes";
+import WhyChooseOurMangoes from "../components/WhyChooseOurMangoes";
+import Statistics from "../components/Statistics";
+import Footer from "../components/Footer";
+import PhotoCarousel from "../components/PhotoCarousel";
 import { useSearchParams } from "react-router-dom";
 import {
   getSortedAndFilteredOrders,
   generateWhatsAppMessage,
   calculatePhotoIndex,
   storeTokens,
-} from "./utils/helpers";
+} from "../utils/helpers";
+import { createOrder, getOrderByPhone, fetchAllStatistics } from "../utils/api";
 
-// LandingPage Component
 export default function LandingPage() {
-  // State Management
   const [form, setForm] = useState({
     name: "",
     phone: "",
     quantity: "",
     location: "",
   });
-
   const [errors, setErrors] = useState({});
   const [showAnimation, setShowAnimation] = useState(true);
   const [userOrders, setUserOrders] = useState([]);
@@ -33,7 +31,6 @@ export default function LandingPage() {
   const [popupMessage, setPopupMessage] = useState("");
   const [activeSection, setActiveSection] = useState(null);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
-  const [isTransitioning] = useState(true);
   const [statistics, setStatistics] = useState({
     totalMangoesDelivered: 0,
     totalOrdersReceived: 0,
@@ -42,30 +39,30 @@ export default function LandingPage() {
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const [searchParams] = useSearchParams();
 
-  // Constants
-  const photos = [
-    "/real-mango-1.jpg",
-    "/real-mango-2.jpg",
-    "/real-mango-3.JPG",
-    "/real-mango-4.jpg",
-  ];
+  const photos = useMemo(
+    () => [
+      "/real-mango-1.jpg",
+      "/real-mango-2.jpg",
+      "/real-mango-3.JPG",
+      "/real-mango-4.jpg",
+    ],
+    []
+  );
 
-  const photosWithDuplicates = [
-    photos[photos.length - 1], // Add the last photo at the beginning for smooth looping
-    ...photos,
-    photos[0], // Add the first photo at the end for smooth looping
-  ];
+  const photosWithDuplicates = useMemo(
+    () => [photos[photos.length - 1], ...photos, photos[0]],
+    [photos]
+  );
 
-  // Effects
   useEffect(() => {
-    async function fetchStatistics() {
+    const fetchStatistics = async () => {
       try {
         const statisticsData = await fetchAllStatistics();
         setStatistics(statisticsData.data);
       } catch (error) {
         console.error("Failed to fetch statistics", error);
       }
-    }
+    };
 
     fetchStatistics();
   }, []);
@@ -88,14 +85,29 @@ export default function LandingPage() {
   useEffect(() => {
     const mobileNumber = searchParams.get("mobilenumber");
     if (mobileNumber) {
-      console.log("Mobile number from URL:", mobileNumber);
       setPhoneForDetails(mobileNumber);
       setActiveSection("details");
       handleGetOrdersAfterPlacedOrder(mobileNumber);
     }
   }, [searchParams]);
 
-  const handleProceed = async () => {
+  const handleGetOrdersAfterPlacedOrder = useCallback(
+    async (mobileNumber) => {
+      const phone = form.phone || mobileNumber;
+      try {
+        const orders = await getOrderByPhone(phone);
+        storeTokens(orders.data.access_token, orders.data.refresh_token);
+        setUserOrders(orders.data.orderDetails);
+        setActiveSection("details");
+        setPhoneForDetails(phone);
+      } catch (err) {
+        setPopupMessage("Failed to fetch orders");
+      }
+    },
+    [form.phone]
+  );
+
+  const handleProceed = useCallback(async () => {
     const message = generateWhatsAppMessage(form);
     const url = `https://wa.me/918830997757?text=${encodeURIComponent(
       message
@@ -103,49 +115,37 @@ export default function LandingPage() {
     window.open(url, "_blank");
     setPopupMessage("");
     await handleGetOrdersAfterPlacedOrder();
-  };
+  }, [form, handleGetOrdersAfterPlacedOrder]);
 
-  const handleCancel = async () => {
+  const handleCancel = useCallback(async () => {
     setPopupMessage("");
     await handleGetOrdersAfterPlacedOrder();
-  };
+  }, [handleGetOrdersAfterPlacedOrder]);
 
-  const handleGetOrdersAfterPlacedOrder = async (mobileNumber) => {
-    const phone = form.phone || mobileNumber;
-    try {
-      const orders = await getOrderByPhone(phone);
-      storeTokens(orders.data.access_token, orders.data.refresh_token);
-      setUserOrders(orders.data.orderDetails);
-      setActiveSection("details");
-      setPhoneForDetails(phone);
-    } catch (err) {
-      setPopupMessage("Failed to fetch orders");
-    }
-  };
-  const handleSearch = (e) => {
+  const handleSearch = useCallback((e) => {
     setSearchTerm(e.target.value.toLowerCase());
-  };
+  }, []);
 
-  const handleSort = (key) => {
-    let direction = "asc";
-    if (sortConfig.key === key && sortConfig.direction === "asc") {
-      direction = "desc";
-    }
-    setSortConfig({ key, direction });
-  };
+  const handleSort = useCallback((key) => {
+    setSortConfig((prevConfig) => {
+      const direction =
+        prevConfig.key === key && prevConfig.direction === "asc"
+          ? "desc"
+          : "asc";
+      return { key, direction };
+    });
+  }, []);
 
-  const handleClose = () => {
-    setPopupMessage(""); // Close the popup
-  };
+  const handleClose = useCallback(() => {
+    setPopupMessage("");
+  }, []);
 
-  const sortedAndFilteredOrders = getSortedAndFilteredOrders(
-    userOrders,
-    searchTerm,
-    sortConfig
+  const sortedAndFilteredOrders = useMemo(
+    () => getSortedAndFilteredOrders(userOrders, searchTerm, sortConfig),
+    [userOrders, searchTerm, sortConfig]
   );
 
-  // Render Section
-  const renderSection = () => {
+  const renderSection = useCallback(() => {
     if (activeSection === "order") {
       return (
         <OrderMangoes
@@ -177,9 +177,19 @@ export default function LandingPage() {
       );
     }
     return null;
-  };
+  }, [
+    activeSection,
+    form,
+    errors,
+    phoneForDetails,
+    userOrders,
+    searchTerm,
+    sortConfig,
+    handleSort,
+    sortedAndFilteredOrders,
+    handleGetOrdersAfterPlacedOrder,
+  ]);
 
-  // Main Render
   return (
     <div className="page">
       {showAnimation && (
@@ -257,7 +267,7 @@ export default function LandingPage() {
               style={{
                 width: "150px",
                 height: "150px",
-                transition: "transform 1.2s ease", // Smooth scaling transition for image
+                transition: "transform 1.2s ease",
               }}
             />
             <div
@@ -265,15 +275,15 @@ export default function LandingPage() {
               style={{
                 textAlign: "center",
                 marginTop: "10px",
-                transition: "transform 1.2s ease", // Smooth scaling transition for text
+                transition: "transform 1.2s ease",
               }}
             >
               <p
                 style={{
                   fontSize: "18px",
                   fontWeight: "bold",
-                  color: "#ff4500", // Updated button text color to a vibrant orange-red
-                  fontFamily: "'Nunito', sans-serif", // Updated font for button text
+                  color: "#ff4500",
+                  fontFamily: "'Nunito', sans-serif",
                   animation: "fadeInText 1.2s ease-in-out",
                   marginTop: "10px",
                 }}
@@ -320,7 +330,7 @@ export default function LandingPage() {
               style={{
                 width: "150px",
                 height: "150px",
-                transition: "transform 1.2s ease", // Smooth scaling transition for image
+                transition: "transform 1.2s ease",
               }}
             />
             <div
@@ -328,15 +338,15 @@ export default function LandingPage() {
               style={{
                 textAlign: "center",
                 marginTop: "10px",
-                transition: "transform 1.2s ease", // Smooth scaling transition for text
+                transition: "transform 1.2s ease",
               }}
             >
               <p
                 style={{
                   fontSize: "18px",
                   fontWeight: "bold",
-                  color: "#ff4500", // Updated button text color to a vibrant orange-red
-                  fontFamily: "'Nunito', sans-serif", // Updated font for button text
+                  color: "#ff4500",
+                  fontFamily: "'Nunito', sans-serif",
                   animation: "fadeInText 1.2s ease-in-out",
                   marginTop: "10px",
                 }}
@@ -352,48 +362,7 @@ export default function LandingPage() {
         <div className="about-mangoes">
           <WhyChooseOurMangoes />
           <Statistics statistics={statistics} />
-
-          <div
-            className="photo-carousel"
-            style={{
-              display: "flex",
-              overflow: "hidden",
-              width: "100%",
-              maxWidth: "900px",
-              margin: "20px auto 0",
-            }}
-          >
-            <div
-              className="carousel-track"
-              style={{
-                display: "flex",
-                transition: isTransitioning
-                  ? "transform 0.5s ease-in-out"
-                  : "none",
-                transform: `translateX(-${
-                  (currentPhotoIndex % photosWithDuplicates.length) * 33.33
-                }%)`, // Ensures looping effect
-              }}
-            >
-              {photosWithDuplicates.map((src, index) => (
-                <img
-                  key={index}
-                  src={src}
-                  alt={`Mango photo ${index + 1}`}
-                  style={{
-                    width: "33.33%",
-                    flexShrink: 0,
-                    height: "auto",
-                    borderRadius: "10px",
-                    marginTop: "20px", // Added space between text and images
-                    margin: "0 10px", // Added horizontal space between images
-                    border: "1px solid #ccc", // Updated to a lighter and more subtle border
-                    boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)", // Enhanced shadow for a more refined look
-                  }}
-                />
-              ))}
-            </div>
-          </div>
+          <PhotoCarousel />
         </div>
       </div>
 
@@ -406,8 +375,8 @@ export default function LandingPage() {
           }
           onClose={handleClose}
         >
-          {popupMessage ===
-          "0 active orders found for this mobile number. Please use a different mobile number." ? null : (
+          {popupMessage !==
+            "0 active orders found for this mobile number. Please use a different mobile number." && (
             <div
               style={{ display: "flex", justifyContent: "center", gap: "10px" }}
             >

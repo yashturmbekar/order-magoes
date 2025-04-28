@@ -6,9 +6,9 @@ import {
   Routes,
   Navigate,
 } from "react-router-dom";
-import LandingPage from "./LandingPage";
-import AdminLogin from "./AdminLogin";
-import AdminOrders from "./AdminOrders";
+import LandingPage from "../pages/LandingPage";
+import AdminLogin from "../pages/AdminLogin";
+import AdminOrders from "../pages/AdminOrders";
 
 function PrivateRoute({ children, requiredRole }) {
   const [userRole, setUserRole] = useState(null);
