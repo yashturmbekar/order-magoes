@@ -13,7 +13,7 @@ body {
 
 .page {
   min-height: 100vh;
-  background-image: url("/src/assets/images/mango-bg.jpg");
+  background-image: url("/src/assets/images/mango-bg.png");
   background-size: cover;
   background-position: center;
   padding: 2rem 1rem;
@@ -562,6 +562,10 @@ button:hover {
 
   .stat-info .odometer {
     font-size: 1.5rem;
+  }
+
+  .page {
+    background-position: left center; /* Adjust position for mobile */
   }
 }
 
