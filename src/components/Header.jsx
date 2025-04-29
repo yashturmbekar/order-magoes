@@ -11,9 +11,9 @@ const Header = () => {
       case "/admin/login":
         return "Admin Panel";
       case "/":
-        return "Home Delivery – Anywhere in Pune | Courier Service – Anywhere in India";
+        return "Home Delivery – Anywhere in Pune";
       case "/orderdetails":
-        return "Home Delivery – Anywhere in Pune | Courier Service – Anywhere in India";
+        return "Home Delivery – Anywhere in Pune";
       default:
         return "";
     }
