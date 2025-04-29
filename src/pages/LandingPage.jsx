@@ -263,7 +263,7 @@ export default function LandingPage() {
             >
               <img
                 id="order-image"
-                src="/src/assets/images/order-magoes.png"
+                src="/src/assets/images/order-mangoes.png"
                 alt="Order Mangoes"
                 style={{
                   width: "150px",
