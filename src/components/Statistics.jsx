@@ -21,11 +21,11 @@ const Statistics = ({ statistics }) => {
         className="stat-info"
         style={{ textAlign: "center", fontSize: "1.2rem", color: "#4e342e" }}
       >
-        <Odometer value={mangoesDelivered} format="(,ddd)" theme="default" />
-        <span> 100 dozen of mangoes delivered to </span>
+        <Odometer value={100} format="(,ddd)" theme="default" />
+        <span> dozen of mangoes delivered to </span>
 
-        <Odometer value={ordersReceived} format="(,ddd)" theme="default" />
-        <span> 42 + mango lovers.</span>
+        <Odometer value={42} format="(,ddd)" theme="default" />
+        <span> + mango lovers.</span>
       </div>
     </div>
   );
