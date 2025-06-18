@@ -22,10 +22,10 @@ const Statistics = ({ statistics }) => {
         style={{ textAlign: "center", fontSize: "1.2rem", color: "#4e342e" }}
       >
         <Odometer value={mangoesDelivered} format="(,ddd)" theme="default" />
-        <span> dozen of mangoes delivered to </span>
+        <span> 100 dozen of mangoes delivered to </span>
 
         <Odometer value={ordersReceived} format="(,ddd)" theme="default" />
-        <span> + mango lovers.</span>
+        <span> 42 + mango lovers.</span>
       </div>
     </div>
   );
